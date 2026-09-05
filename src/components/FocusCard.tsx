@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { DayLog, Task, WhenTag } from '../types';
 import { dueLabel } from '../lib/priority';
 import type { YMD } from '../lib/dates';
+import SectionTitle from './SectionTitle';
 
 interface Props {
   today: YMD;
@@ -28,7 +29,7 @@ export default function FocusCard(p: Props) {
     return (
       <div className="card focus">
         <div>
-          <p className="sec" style={{ marginBottom: 6 }}>今日の最優先</p>
+          <SectionTitle>今日の最優先</SectionTitle>
           <h2 style={{ color: 'var(--text-muted)', fontSize: 20 }}>まず1つだけ書いてみましょう</h2>
           <input
             className="textin" style={{ marginTop: 10 }} value={draft}
@@ -51,7 +52,7 @@ export default function FocusCard(p: Props) {
     return (
       <div className="card focus">
         <div>
-          <p className="sec" style={{ marginBottom: 6 }}>今日の最優先</p>
+          <SectionTitle>今日の最優先</SectionTitle>
           <h2>{c ? c.title : '選べるものがありません'}</h2>
           {c && dueLabel(c, p.today) && (
             <p className={`due${dueLabel(c, p.today)!.over ? ' over' : ''}`}>
@@ -73,7 +74,7 @@ export default function FocusCard(p: Props) {
   return (
     <div className="card focus">
       <div>
-        <p className="sec" style={{ marginBottom: 6 }}>今日の最優先</p>
+        <SectionTitle>今日の最優先</SectionTitle>
         <h2>{p.chosen.title}</h2>
         {due && <p className={`due${due.over ? ' over' : ''}`}>{due.text}</p>}
       </div>

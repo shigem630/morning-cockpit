@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Task } from '../types';
 import { dueLabel } from '../lib/priority';
 import { dayCount, type YMD } from '../lib/dates';
+import SectionTitle from './SectionTitle';
 
 interface Props {
   today: YMD;
@@ -35,7 +36,7 @@ export default function TaskList(p: Props) {
   return (
     <div className="card">
       <div className="rowbar">
-        <p className="sec">やること一覧（{p.tasks.length}件）</p>
+        <SectionTitle note={`全${p.tasks.length}件`}>やること</SectionTitle>
         <button onClick={() => setAdding((v) => !v)}>{adding ? 'やめる' : '追加'}</button>
       </div>
 
@@ -113,7 +114,7 @@ export function SoonCard({ today, task }: { today: YMD; task: Task | null }) {
   const days = dayCount(task.createdAt, today);
   return (
     <div className="card">
-      <p className="sec">急ぎではないが重要な仕事</p>
+      <SectionTitle note="〆切がないぶん、後回しになりやすい仕事">重要・急ぎでない</SectionTitle>
       <div className="rowbar">
         <span>{task.title}</span>
         <span className="sub">

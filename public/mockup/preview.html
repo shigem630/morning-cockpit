@@ -61,8 +61,13 @@ body {
 h1,h2,h3 { font-weight: 500; margin: 0; }
 
 .sec {
-  font-size: 13px; font-weight: 500; letter-spacing: .02em;
-  color: var(--text-muted); margin: 0 0 12px;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  font-size: 15px; font-weight: 600; letter-spacing: .02em;
+  color: var(--text); margin: 0 0 14px;
+}
+.sec .note {
+  font-size: 12px; font-weight: 400; letter-spacing: 0;
+  color: var(--text-muted);
 }
 .sub { font-size: 14px; color: var(--text-muted); }
 
@@ -202,7 +207,7 @@ button:hover { background: var(--surface-sub); }
   <!-- 今日の一点 -->
   <div class="card focus" id="focus-normal">
     <div>
-      <p class="sec" style="margin-bottom:6px">今日の一点</p>
+      <p class="sec">今日の最優先</p>
       <h2>避難訓練の準備</h2>
       <p class="due">〆9月1日・4日超過</p>
     </div>
@@ -222,7 +227,7 @@ button:hover { background: var(--surface-sub); }
 
   <div class="card focus hide" id="focus-empty">
     <div>
-      <p class="sec" style="margin-bottom:6px">今日の一点</p>
+      <p class="sec">今日の最優先</p>
       <h2 style="color:var(--text-muted);font-size:20px">まず1つだけ書いてみましょう</h2>
       <input placeholder="例：避難訓練の準備" style="font:inherit;font-size:16px;margin-top:10px;padding:8px 12px;width:340px;border:1px solid var(--border);border-radius:var(--r-ctrl);background:var(--surface);color:var(--text)">
     </div>
@@ -233,7 +238,7 @@ button:hover { background: var(--surface-sub); }
 
     <!-- 返事待ち -->
     <div class="card">
-      <p class="sec">返事待ち</p>
+      <p class="sec">返事待ち<span class="note">人に頼んで、返ってきていない仕事</span></p>
       <div id="stalled-list">
         <div class="item">
           <div class="head"><span>内規案の確認</span><button>声をかけた</button></div>
@@ -254,7 +259,7 @@ button:hover { background: var(--surface-sub); }
 
     <!-- 今日のチェック -->
     <div class="card">
-      <p class="sec">今日のチェック</p>
+      <p class="sec">今日のルーティン<span class="note">毎日・毎週・毎月やること</span></p>
       <label class="chk on"><input type="checkbox" checked><span>メールの確認</span></label>
       <label class="chk"><input type="checkbox"><span>メールの返信</span></label>
       <label class="chk"><input type="checkbox"><span>ジョブカンの承認</span></label>
@@ -285,7 +290,7 @@ button:hover { background: var(--surface-sub); }
   <div class="stack">
 
     <div class="card" id="soon">
-      <p class="sec">そろそろ</p>
+      <p class="sec">重要・急ぎでない<span class="note">〆切がないぶん、後回しになりやすい仕事</span></p>
       <div class="head" style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
         <span>2027年度パンフレット叩き台</span>
         <span class="sub">重要・〆切なし・<span class="d7">38日目</span></span>
@@ -294,7 +299,7 @@ button:hover { background: var(--surface-sub); }
 
     <div class="card" id="tasks">
       <div style="display:flex;justify-content:space-between;align-items:baseline">
-        <p class="sec">やること（10件）</p><button>追加</button>
+        <p class="sec">やること<span class="note">全10件</span></p><button>追加</button>
       </div>
       <div class="item"><div class="head"><span>配慮申請書類の作成</span><span class="sub">重要　〆9/20・あと15日</span></div></div>
       <div class="item"><div class="head"><span>満田かなんさんに電話</span><span class="sub">重要　〆9/25・あと20日</span></div></div>

@@ -13,6 +13,7 @@ import {
 import { CalendarApiError, fetchTodayEvents, NoTokenError } from './lib/calendar';
 import { INITIAL_TASKS } from './data/initialTasks';
 import type { Stalled, WhenTag } from './types';
+import SectionTitle from './components/SectionTitle';
 import TopBar, { type Theme } from './components/TopBar';
 import { ClockSkewBanner, HolidayTableBanner, SyncBanner } from './components/Banners';
 import FocusCard from './components/FocusCard';
@@ -266,7 +267,7 @@ function Cockpit({ user }: { user: User }) {
 
         {help && (
           <div className="card" style={{ marginBottom: 14 }}>
-            <p className="sec">キー操作</p>
+            <SectionTitle>キー操作</SectionTitle>
             <p className="sub" style={{ margin: 0 }}>
               1〜5：ルーティンワークを入れる／外す　　Enter：今日の最優先を「終わった」にする　　? ：この一覧
             </p>
@@ -275,7 +276,7 @@ function Cockpit({ user }: { user: User }) {
 
         {missingSeeds.length > 0 && (
           <div className="card" style={{ marginBottom: 14 }}>
-            <p className="sec">はじめに</p>
+            <SectionTitle>はじめに</SectionTitle>
             <p style={{ margin: '0 0 12px' }}>
               やることリストの{missingSeeds.length}件が、まだ入っていません。
               <span className="sub">（元のファイルは消しません。すでに入っているものは飛ばします）</span>

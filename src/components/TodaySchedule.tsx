@@ -1,5 +1,6 @@
 import type { CalEvent } from '../lib/calendar';
 import type { WhenTag } from '../types';
+import SectionTitle from './SectionTitle';
 
 export type CalState =
   | { kind: 'idle' }
@@ -34,7 +35,7 @@ export default function TodaySchedule({ state, nowHHMM, when, onLoad }: Props) {
   return (
     <div className="card">
       <div className="rowbar">
-        <p className="sec">今日の予定</p>
+        <SectionTitle>今日の予定</SectionTitle>
         {state.kind !== 'loading' && (
           <button onClick={onLoad}>{state.kind === 'ok' ? '読み直す' : '予定を読む'}</button>
         )}

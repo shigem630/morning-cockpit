@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Stalled } from '../types';
 import { dayCount, formatShort, type YMD } from '../lib/dates';
+import SectionTitle from './SectionTitle';
 
 interface Props {
   today: YMD;
@@ -45,7 +46,7 @@ export default function StalledList(p: Props) {
   return (
     <div className="card">
       <div className="rowbar">
-        <p className="sec">頼んだ仕事の返事待ち</p>
+        <SectionTitle note="人に頼んで、返ってきていない仕事">返事待ち</SectionTitle>
         <button onClick={() => setAdding((v) => !v)}>{adding ? 'やめる' : '足す'}</button>
       </div>
 

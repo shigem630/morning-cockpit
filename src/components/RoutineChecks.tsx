@@ -1,5 +1,6 @@
 import type { Routine } from '../data/routines';
 import type { DayLog } from '../types';
+import SectionTitle from './SectionTitle';
 
 interface Props {
   eligible: Routine[];
@@ -20,7 +21,7 @@ export default function RoutineChecks(p: Props) {
   if (!p.working) {
     return (
       <div className="card">
-        <p className="sec">今日のルーティンワーク</p>
+        <SectionTitle note="毎日・毎週・毎月やること">今日のルーティン</SectionTitle>
         <p className="empty">
           {p.calendarSaysWork
             ? '今日は休みとして記録しました。'
@@ -50,7 +51,7 @@ export default function RoutineChecks(p: Props) {
   return (
     <div className="card">
       <div className="rowbar">
-        <p className="sec">今日のルーティンワーク</p>
+        <SectionTitle note="毎日・毎週・毎月やること">今日のルーティン</SectionTitle>
         <button onClick={() => p.onSetWorking(false)}>今日は休み</button>
       </div>
       {daily.map((r, i) => row(r, i + 1))}
