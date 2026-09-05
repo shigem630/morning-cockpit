@@ -56,11 +56,18 @@ h1,h2,h3 { font-weight: 500; margin: 0; }
 /* 見出しは短く強く。説明は小さく添える。
    長い日本語を薄いラベルに詰め込むと、見出しに見えなくなる。 */
 .sec {
-  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-  font-size: 15px; font-weight: 600; letter-spacing: .02em;
-  color: var(--text); margin: 0 0 14px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 16px; font-weight: 700; letter-spacing: .05em;
+  color: var(--text); margin: 0 0 16px;
+}
+/* 左のしるし。上部の日付と同じ形にして「ここが区切り」を一目で分かるようにする。 */
+.sec::before {
+  content: ""; flex: none;
+  width: 3px; height: 15px; border-radius: 2px;
+  background: var(--accent);
 }
 .sec .note {
+  flex: none;
   font-size: 12px; font-weight: 400; letter-spacing: 0;
   color: var(--text-muted);
 }

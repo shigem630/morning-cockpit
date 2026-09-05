@@ -61,11 +61,18 @@ body {
 h1,h2,h3 { font-weight: 500; margin: 0; }
 
 .sec {
-  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-  font-size: 15px; font-weight: 600; letter-spacing: .02em;
-  color: var(--text); margin: 0 0 14px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 16px; font-weight: 700; letter-spacing: .05em;
+  color: var(--text); margin: 0 0 16px;
+}
+/* 左のしるし。上部の日付と同じ形にして「ここが区切り」を一目で分かるようにする。 */
+.sec::before {
+  content: ""; flex: none;
+  width: 3px; height: 15px; border-radius: 2px;
+  background: var(--accent);
 }
 .sec .note {
+  flex: none;
   font-size: 12px; font-weight: 400; letter-spacing: 0;
   color: var(--text-muted);
 }
@@ -160,7 +167,17 @@ button:hover { background: var(--surface-sub); }
   .sched.now { background:var(--surface-sub); border-radius:6px; padding:5px 8px; margin:0 -8px; }
 
   .empty { font-size:14px; color:var(--text-muted); padding:8px 0 4px; }
-  .empty a, .linkish { color:var(--accent); text-decoration:underline; cursor:pointer; }
+  .empty a, .legend { font-size:12px; color:var(--text-muted); margin:0 0 14px; }
+.legend b { font-weight:600; color:var(--text); }
+.rowacts { display:inline-flex; gap:6px; margin-left:14px; vertical-align:middle; }
+.act {
+  font-size:12px; line-height:1.7; padding:0 10px; border-radius:999px;
+  border:1px solid var(--border); background:var(--surface); color:var(--text-muted);
+}
+.act:hover { background:var(--surface-sub); color:var(--text); }
+.act.ok { color:var(--done); border-color:color-mix(in srgb, var(--done) 35%, var(--border)); }
+.act.ok:hover { background:color-mix(in srgb, var(--done) 12%, var(--surface)); color:var(--done); }
+.linkish { color:var(--accent); text-decoration:underline; cursor:pointer; }
 
   .stack { margin-top:14px; display:flex; flex-direction:column; gap:14px; }
   .nums { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
@@ -221,7 +238,10 @@ button:hover { background: var(--surface-sub); }
           <button aria-pressed="false">夕方</button>
         </span>
       </div>
-      <p class="sub" style="margin:10px 0 0">直近30日で18日</p>
+      <p class="sub" style="margin:10px 0 0">
+        <span class="linkish">別のにする</span>
+        <span style="margin-left:14px">直近30日で18日</span>
+      </p>
     </div>
   </div>
 
@@ -301,11 +321,14 @@ button:hover { background: var(--surface-sub); }
       <div style="display:flex;justify-content:space-between;align-items:baseline">
         <p class="sec">やること<span class="note">全10件</span></p><button>追加</button>
       </div>
-      <div class="item"><div class="head"><span>配慮申請書類の作成</span><span class="sub">重要　〆9/20・あと15日</span></div></div>
-      <div class="item"><div class="head"><span>満田かなんさんに電話</span><span class="sub">重要　〆9/25・あと20日</span></div></div>
-      <div class="item"><div class="head"><span>私学教頭会内規案の作成</span><span class="sub">〆10/31・あと56日</span></div></div>
-      <div class="item"><div class="head"><span>向洋中学校 学校訪問の準備</span><span class="sub">〆切なし</span></div></div>
-      <div class="item"><div class="head"><span>10月中学校教員対象説明会：案内文作成</span><span class="sub">〆切なし</span></div></div>
+      <p class="legend">
+        <b>終わった</b>＝やり切った　／　<b>やらない</b>＝やらずに一覧から外す　（どちらも下の記録から戻せます）
+      </p>
+      <div class="item"><div class="head"><span>配慮申請書類の作成</span><span class="sub">重要　〆9/20・あと15日<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item"><div class="head"><span>満田かなんさんに電話</span><span class="sub">重要　〆9/25・あと20日<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item"><div class="head"><span>私学教頭会内規案の作成</span><span class="sub">〆10/31・あと56日<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item"><div class="head"><span>向洋中学校 学校訪問の準備</span><span class="sub">〆切なし<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item"><div class="head"><span>10月中学校教員対象説明会：案内文作成</span><span class="sub">〆切なし<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
       <p class="more">ほか5件 ・ <span class="linkish">すべて見る</span></p>
     </div>
 

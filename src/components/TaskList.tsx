@@ -40,6 +40,13 @@ export default function TaskList(p: Props) {
         <button onClick={() => setAdding((v) => !v)}>{adding ? 'やめる' : '追加'}</button>
       </div>
 
+      {p.tasks.length > 0 && (
+        <p className="legend">
+          <b>終わった</b>＝やり切った　／　<b>やらない</b>＝やらずに一覧から外す　
+          （どちらも下の記録から戻せます）
+        </p>
+      )}
+
       {adding && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
           <input className="textin" placeholder="やること" value={title}
@@ -67,10 +74,12 @@ export default function TaskList(p: Props) {
               <span className="sub" style={{ whiteSpace: 'nowrap' }}>
                 {t.important && '重要　'}
                 {d ? d.text : '〆切なし'}
-                {'　'}
-                <button className="linkish" onClick={() => p.onDone(t.id)}>終わった</button>
-                {'　'}
-                <button className="linkish" onClick={() => p.onDelete(t.id)}>消す</button>
+                <span className="rowacts">
+                  <button className="act ok" onClick={() => p.onDone(t.id)}
+                    title="やり切ったものとして一覧から外します。あとで戻せます。">終わった</button>
+                  <button className="act" onClick={() => p.onDelete(t.id)}
+                    title="やらないことにして一覧から外します。あとで戻せます。">やらない</button>
+                </span>
               </span>
             </div>
           </div>
@@ -89,7 +98,7 @@ export default function TaskList(p: Props) {
       {p.closed.length > 0 && (
         <p className="more">
           <button className="linkish" onClick={() => setShowClosed((v) => !v)}>
-            終わった・消したもの（{p.closed.length}件）
+            終わった・やらないことにしたもの（{p.closed.length}件）
           </button>
         </p>
       )}
@@ -98,7 +107,7 @@ export default function TaskList(p: Props) {
           <div className="head">
             <span className="sub title-1line" title={t.title}>
               {t.title}
-              {t.doneAt ? '　終わった' : '　消した'}
+              {t.doneAt ? '　終わった' : '　やらないことにした'}
             </span>
             <button className="linkish" onClick={() => p.onRestore(t.id)}>戻す</button>
           </div>

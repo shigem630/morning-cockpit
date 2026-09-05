@@ -28,6 +28,10 @@
 .focus .due { font-size:14px; margin-top:2px; color:var(--text-muted); }
 .focus .due.over { color:var(--alert); }
 .acts { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+/* 閉じたあとの表示。カードが勝手に次の仕事へ入れ替わらないので、結果をここに出す。 */
+.focus h2.settled { color:var(--text-muted); }
+.focus .note-done    { font-size:14px; color:var(--done);       margin:2px 0 0; }
+.focus .note-started { font-size:14px; color:var(--text-muted); margin:2px 0 0; }
 .primary { border-color:var(--accent); color:var(--accent); }
 button[aria-pressed="true"].primary { background:var(--accent); color:#fff; }
 .when { display:inline-flex; gap:6px; margin-left:8px; }
@@ -47,6 +51,19 @@ button[aria-pressed="true"].primary { background:var(--accent); color:#fff; }
 .item .meta { font-size:14px; color:var(--text-muted); margin-top:2px; }
 .more { font-size:14px; color:var(--text-muted); margin:12px 0 0; }
 .title-1line { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* 「終わった」と「やらない」。同じ見た目の下線リンク2本では差が読み取れないので、
+   終わった側にだけ色を持たせる。取り消せる操作なので、赤（警告）は使わない。 */
+.legend { font-size:12px; color:var(--text-muted); margin:0 0 14px; }
+.legend b { font-weight:600; color:var(--text); }
+.rowacts { display:inline-flex; gap:6px; margin-left:14px; vertical-align:middle; }
+.act {
+  font-size:12px; line-height:1.7; padding:0 10px; border-radius:999px;
+  border:1px solid var(--border); background:var(--surface); color:var(--text-muted);
+}
+.act:hover { background:var(--surface-sub); color:var(--text); }
+.act.ok { color:var(--done); border-color:color-mix(in srgb, var(--done) 35%, var(--border)); }
+.act.ok:hover { background:color-mix(in srgb, var(--done) 12%, var(--surface)); color:var(--done); }
 
 .chk { display:flex; align-items:center; gap:10px; padding:5px 0; font-size:16px; cursor:pointer; }
 .chk input { width:17px; height:17px; accent-color:var(--done); margin:0; }

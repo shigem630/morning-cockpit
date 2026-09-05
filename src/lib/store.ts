@@ -153,6 +153,16 @@ export async function reopenStalled(id: string) {
   });
 }
 
+/** 今日の1件を選び直す。仕事そのものには触らない。
+    focusClosed は消さない（「今日は閉じた」という事実は選び直しで無かったことにならない）。 */
+export async function clearFocus(date: YMD) {
+  const ref = logDoc(date);
+  await setDoc(ref, {}, { merge: true });   // 記録が無い日でも updateDoc が通るようにする
+  await updateDoc(ref, {
+    focusTaskId: deleteField(), focusResult: deleteField(), focusWhen: deleteField(),
+  });
+}
+
 export async function setFocus(date: YMD, patch: Partial<DayLog>) {
   await setDoc(logDoc(date), patch, { merge: true });
 }

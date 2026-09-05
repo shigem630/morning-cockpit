@@ -15,6 +15,8 @@ interface Props {
   streak: { hit: number; of: number };
   onChoose: (id: string) => void;
   onSkip: () => void;
+  /** 決めたあとに選び直す。今日の1件を空に戻すだけで、仕事は消さない。 */
+  onReselect: () => void;
   onResult: (r: 'done' | 'started') => void;
   onWhen: (w: WhenTag) => void;
   onCreateFirst: (title: string) => void;
@@ -81,8 +83,12 @@ export default function FocusCard(p: Props) {
     <div className="card focus">
       <div>
         <SectionTitle>今日の最優先</SectionTitle>
-        <h2>{p.chosen.title}</h2>
-        {due && <p className={`due${due.over ? ' over' : ''}`}>{due.text}</p>}
+        <h2 className={result === 'done' ? 'settled' : undefined}>{p.chosen.title}</h2>
+        {result === 'done' && <p className="note-done">終わりました。おつかれさまでした。</p>}
+        {result === 'started' && (
+          <p className="note-started">手をつけました。続きは明日の第一候補に出します。</p>
+        )}
+        {!result && due && <p className={`due${due.over ? ' over' : ''}`}>{due.text}</p>}
       </div>
       <div style={{ textAlign: 'right' }}>
         <div className="acts">
@@ -100,7 +106,10 @@ export default function FocusCard(p: Props) {
           </span>
         </div>
         <p className="sub" style={{ margin: '10px 0 0' }}>
-          直近30日で{p.streak.hit}日
+          <button className="linkish" onClick={p.onReselect}>
+            {result ? '次のを選ぶ' : '別のにする'}
+          </button>
+          <span style={{ marginLeft: 14 }}>直近30日で{p.streak.hit}日</span>
         </p>
       </div>
     </div>

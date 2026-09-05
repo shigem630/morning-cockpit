@@ -28,6 +28,9 @@ export interface DayLog {
   focusTaskId?: string;
   focusResult?: FocusResult;
   focusWhen?: WhenTag;
+  /** その日、最優先を「終わった」か「手はつけた」で一度でも閉じたか。
+      選び直しても消さない。運用テストの判定はこの1つだけを数える。 */
+  focusClosed?: boolean;
   /** その日を出勤として扱うか。未設定なら暦（平日か祝日か）に従う。
       土曜出勤も、平日の休みも、この1つで表す。 */
   worked?: boolean;

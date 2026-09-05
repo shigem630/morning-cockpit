@@ -7,7 +7,7 @@ import {
 import { eligibleRoutines, last30Days } from './lib/eligible';
 import { isOpen, sortTasks } from './lib/priority';
 import {
-  addStalled, addTask, nudge, reopenStalled, resolveStalled, restoreTask, setFocus,
+  addStalled, addTask, clearFocus, nudge, reopenStalled, resolveStalled, restoreTask, setFocus,
   setWorked, toggleCheck, unnudge, updateTask, useDayLog, useRecentLogs, useStalled,
   useTasks, useYesterdayLog,
 } from './lib/store';
@@ -112,7 +112,9 @@ function Cockpit({ user }: { user: User }) {
 
   /* ───── 今日の最優先 ───── */
   const [skip, setSkip] = useState(0);
-  const chosen = openTasks.find((t) => t.id === log.focusTaskId) ?? null;
+  // 全件から引く。openTasks から引くと「終わった」を押した瞬間に一覧から外れ、
+  // カードが黙って次の候補に入れ替わってしまう（何を閉じたのか分からなくなる）。
+  const chosen = tasks.find((t) => t.id === log.focusTaskId) ?? null;
 
   // 昨日「手はつけた」で終わった仕事は、今朝いちばんの候補にする。
   // 手をつけたものを翌日に忘れるのが、いちばんもったいない。
@@ -325,8 +327,9 @@ function Cockpit({ user }: { user: User }) {
             hasAnyTask={openTasks.length > 0} streak={streak} carriedOver={carriedOver}
             onChoose={(id) => setFocus(today, { focusTaskId: id, focusResult: null })}
             onSkip={() => setSkip((s) => s + 1)}
+            onReselect={() => clearFocus(today)}
             onResult={(r) => {
-              setFocus(today, { focusResult: r });
+              setFocus(today, { focusResult: r, focusClosed: true });
               if (r === 'done' && chosen) updateTask(chosen.id, { doneAt: today });
             }}
             onWhen={(w: WhenTag) => setFocus(today, { focusWhen: w })}
