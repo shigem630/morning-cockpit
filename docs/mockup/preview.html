@@ -304,27 +304,6 @@ button:hover { background: var(--surface-sub); }
       <p class="more">ほか5件 ・ <span class="linkish">すべて見る</span></p>
     </div>
 
-    <div class="card" id="numbers">
-      <p class="sec">数字</p>
-      <div class="nums">
-        <div class="num">
-          <p class="sub" style="margin:0 0 4px">次のイベント　11月7日（小学生）</p>
-          <p class="empty" style="padding:0">11/7の申込CSVをまだ取り込んでいません<br><span class="linkish">teacher.html を開く</span></p>
-        </div>
-        <div class="num">
-          <p class="sub" style="margin:0 0 4px">8月29日　申込</p>
-          <p class="v">121 <span class="sub">/ 目標100名</span></p>
-          <p class="sub" style="margin:4px 0 0;color:var(--done)">目標達成（中71・小50）</p>
-        </div>
-        <div class="num">
-          <p class="sub" style="margin:0 0 4px">年間　新規訪問者</p>
-          <p class="v">218 <span class="sub">/ 320名</span></p>
-          <div class="bar"><i style="width:68%"></i></div>
-        </div>
-      </div>
-      <p class="sub" style="margin:12px 0 0">最終更新 9月3日（2日前）</p>
-    </div>
-
   </div>
 </div>
 
@@ -362,7 +341,6 @@ button:hover { background: var(--surface-sub); }
       $('#stalled-empty').classList.remove('hide');
       $('#soon').classList.add('hide');
       $('#tasks').classList.add('hide');
-      $('#numbers').classList.add('hide');
     }
   };
   $$('.devbar button').forEach(b => b.onclick = () => {
@@ -371,7 +349,7 @@ button:hover { background: var(--surface-sub); }
     $('#cal-ok').classList.remove('hide'); $('#cal-ng').classList.add('hide');
     $('#focus-normal').classList.remove('hide'); $('#focus-empty').classList.add('hide');
     $('#stalled-list').classList.remove('hide'); $('#stalled-empty').classList.add('hide');
-    ['#soon','#tasks','#numbers'].forEach(s => $(s).classList.remove('hide'));
+    ['#soon','#tasks'].forEach(s => $(s).classList.remove('hide'));
     states[b.dataset.s]();
   });
 </script>

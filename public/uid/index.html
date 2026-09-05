@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UIDの確認 — morning-cockpit</title>
+<link rel="stylesheet" href="../mockup/tokens.css">
+<style>
+  .wrap{max-width:680px;margin:0 auto;padding:40px 20px 80px}
+  h1{font-size:24px;margin:0 0 8px}
+  .lead{color:var(--text-muted);font-size:14px;margin:0 0 28px}
+  .card{background:var(--surface);border:1px solid var(--border);
+        border-radius:var(--r-card);padding:22px;margin-bottom:18px}
+  h2{font-size:16px;margin:0 0 14px}
+  button{font-family:var(--font);font-size:15px;padding:11px 20px;
+         border-radius:var(--r-ctrl);border:1px solid var(--border);
+         background:var(--surface-sub);color:var(--text);cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button:disabled{opacity:.45;cursor:default}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .uid{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+       font-size:20px;letter-spacing:.02em;background:var(--surface-sub);
+       border:1px solid var(--border);border-radius:var(--r-ctrl);
+       padding:14px 16px;word-break:break-all;margin:10px 0 14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .note{font-size:13px;color:var(--text-muted);line-height:1.7}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+       font-size:13px;background:var(--surface-sub);padding:2px 6px;border-radius:4px}
+  .ok{color:var(--done);font-weight:700}
+  .ng{color:var(--alert);font-weight:700}
+  .warn{color:var(--warn);font-weight:700}
+  .stamp{position:fixed;right:10px;bottom:8px;font-size:11px;color:var(--text-muted);opacity:.7}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>UIDの確認</h1>
+<p class="lead">ログインすると、先生のアカウントに割り当てられた「UID」という文字列が出ます。
+これをセキュリティルールに書き込むと、<strong>先生以外は誰も読み書きできない</strong>状態になります。</p>
+
+<div class="card">
+  <h2>1. Googleでログイン</h2>
+  <div class="row"><button id="login" class="primary">Googleでログイン</button>
+    <button id="logout" hidden>ログアウト</button></div>
+  <p class="note" id="authnote" style="margin:14px 0 0">まだログインしていません。</p>
+</div>
+
+<div class="card" id="uidcard" hidden>
+  <h2>2. あなたのUID</h2>
+  <div class="uid" id="uid">—</div>
+  <div class="row"><button id="copy">UIDをコピー</button></div>
+  <p class="note" style="margin:14px 0 0">これは秘密の値ではありません（推測はできません）。
+  そのまま貼り付けて送ってください。</p>
+</div>
+
+<div class="card" id="testcard" hidden>
+  <h2>3. 保存できるか試す</h2>
+  <p class="note" style="margin:0 0 14px">実際に1件書き込んで、すぐ読み返します。<br>
+  <strong>ルールを書く前は <code>permission-denied</code> で失敗するのが正解です。</strong>
+  ルールを書いた後にもう一度押して、○になれば完了です。</p>
+  <div class="row"><button id="test">書き込みを試す</button></div>
+  <div id="result" style="margin-top:14px"></div>
+</div>
+
+</div>
+<div class="stamp" id="stamp"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyABe18Aqo-YDp5wdzUINft2pfPX5Iso5hI",
+  authDomain: "morning-cockpit-38e47.firebaseapp.com",
+  projectId: "morning-cockpit-38e47",
+  storageBucket: "morning-cockpit-38e47.firebasestorage.app",
+  messagingSenderId: "102076936598",
+  appId: "1:102076936598:web:086679dcf472c0efa62db7"
+};
+
+const $ = id => document.getElementById(id);
+$('stamp').textContent = 'uid page 2026-09-05';
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    $('authnote').innerHTML = '<span class="ok">○</span> ログイン中： <strong>'
+      + (user.email || '(メール不明)') + '</strong>';
+    $('uid').textContent = user.uid;
+    $('uidcard').hidden = false;
+    $('testcard').hidden = false;
+    $('login').hidden = true;
+    $('logout').hidden = false;
+  } else {
+    $('authnote').textContent = 'まだログインしていません。';
+    $('uidcard').hidden = true;
+    $('testcard').hidden = true;
+    $('login').hidden = false;
+    $('logout').hidden = true;
+  }
+});
+
+$('login').onclick = async () => {
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch (e) {
+    $('authnote').innerHTML = '<span class="ng">×</span> ログインできませんでした<br>'
+      + '<code>' + (e.code || e.message) + '</code><br>'
+      + 'この画面をそのまま撮って送ってください。';
+  }
+};
+$('logout').onclick = () => signOut(auth);
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText($('uid').textContent); alert('コピーしました'); }
+  catch { alert('上の文字を選んでコピーしてください'); }
+};
+
+$('test').onclick = async () => {
+  const R = $('result');
+  R.innerHTML = '<p class="note">試しています…</p>';
+  const ref = doc(db, 'cockpit', 'main', 'logs', '_probe');
+  try {
+    await setDoc(ref, { at: serverTimestamp(), note: 'UID確認ページからの書き込みテスト' });
+  } catch (e) {
+    R.innerHTML = '<p><span class="ng">×</span> 書き込めませんでした</p>'
+      + '<p class="note">エラーコード： <code>' + (e.code || e.message) + '</code><br>'
+      + (e.code === 'permission-denied'
+         ? 'ルールをまだ書いていない段階では、これが<strong>正解</strong>です。'
+         : 'これは想定外です。この画面を撮って送ってください。') + '</p>';
+    return;
+  }
+  try {
+    const snap = await getDoc(ref);
+    R.innerHTML = '<p><span class="ok">○</span> 書き込めて、読み返せました</p>'
+      + '<p class="note">保存された中身： <code>'
+      + JSON.stringify(snap.data(), (k,v) => v && v.seconds ? '(サーバー時刻)' : v)
+      + '</code><br>Firestore が使える状態です。</p>';
+  } catch (e) {
+    R.innerHTML = '<p><span class="warn">△</span> 書けたが読み返せませんでした</p>'
+      + '<p class="note">エラーコード： <code>' + (e.code || e.message) + '</code><br>'
+      + 'ルールの read だけが抜けている可能性があります。</p>';
+  }
+};
+</script>
+</body>
+</html>

@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "cockpit-static",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", ".", "--listen", "4173", "--no-clipboard"],
-      "port": 4173
+      "name": "morning-cockpit",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173
     }
   ]
 }

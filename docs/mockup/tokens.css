@@ -1,0 +1,96 @@
+/* morning-cockpit デザイントークン
+   これは使い捨てではなく、本番でもそのまま使う資産。 */
+
+:root {
+  color-scheme: light dark;
+
+  --bg:          #FAFAF8;
+  --surface:     #FFFFFF;
+  --surface-sub: #F4F4F1;
+  --border:      #E8E8E4;
+
+  --text:        #1A1A2E;
+  --text-muted:  #6E6E8E;
+
+  --accent:      #7B1535;   /* 梅光えんじ。フォーカスリングと日付の縦線のみ */
+  --warn:        #8A6410;   /* AA適合（旧 #B8860B は 3.1:1 で不合格だった） */
+  --alert:       #C62828;
+  --done:        #2E7D32;
+
+  --r-card: 12px;
+  --r-ctrl: 8px;
+
+  --font: 'Hiragino Sans', 'Yu Gothic UI', 'Yu Gothic', Meiryo, system-ui, sans-serif;
+}
+
+:root[data-theme="dark"],
+html:not([data-theme="light"]) { }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#16161A; --surface:#1E1E24; --surface-sub:#24242C; --border:#2C2C34;
+    --text:#E8E8F0; --text-muted:#9E9EB0;
+    --accent:#BD6581; --warn:#D9A93A; --alert:#E86B6B; --done:#5FBF64;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#16161A; --surface:#1E1E24; --surface-sub:#24242C; --border:#2C2C34;
+  --text:#E8E8F0; --text-muted:#9E9EB0;
+  --accent:#BD6581; --warn:#D9A93A; --alert:#E86B6B; --done:#5FBF64;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.7;
+  word-break: auto-phrase;
+  line-break: strict;
+}
+
+h1,h2,h3 { font-weight: 500; margin: 0; }
+
+.sec {
+  font-size: 13px; font-weight: 500; letter-spacing: .02em;
+  color: var(--text-muted); margin: 0 0 12px;
+}
+.sub { font-size: 14px; color: var(--text-muted); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 20px 24px;
+}
+
+button {
+  font: inherit; font-size: 14px;
+  padding: 6px 14px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--r-ctrl);
+  cursor: pointer;
+}
+button:hover { background: var(--surface-sub); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* 経過日数の3段階。ドットを使わず、文字の色と太さだけで表す */
+.d0 { color: var(--text-muted); font-weight: 400; }
+.d3 { color: var(--text);       font-weight: 500; }
+.d7 { color: var(--alert);      font-weight: 700; }
+
+.masked { filter: blur(4px); transition: filter .12s; }
+.masked:hover { filter: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

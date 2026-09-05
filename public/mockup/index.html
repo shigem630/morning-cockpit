@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>朝の司令塔（見本）</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 48px; }
+
+  .devbar {
+    position: sticky; top:0; z-index:9; display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+    background: var(--surface-sub); border-bottom:1px solid var(--border);
+    padding:8px 24px; font-size:13px; color:var(--text-muted);
+  }
+  .devbar button { font-size:13px; padding:4px 10px; }
+  .devbar button[aria-pressed="true"] { background: var(--text); color: var(--surface); border-color: var(--text); }
+
+  .top { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0; }
+  .top .date { display:flex; align-items:center; gap:10px; font-size:16px; font-weight:500; }
+  .top .date::before { content:""; width:3px; height:18px; background:var(--accent); border-radius:2px; }
+  .top .right { display:flex; align-items:center; gap:12px; font-size:13px; color:var(--text-muted); }
+  .seg { display:inline-flex; border:1px solid var(--border); border-radius:var(--r-ctrl); overflow:hidden; }
+  .seg button { border:0; border-radius:0; padding:4px 10px; font-size:13px; }
+  .seg button[aria-pressed="true"] { background:var(--text); color:var(--surface); }
+
+  .banner {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    border:1px solid var(--alert); background:var(--surface); color:var(--alert);
+    border-radius:var(--r-ctrl); padding:10px 16px; margin-bottom:14px; font-size:14px;
+  }
+  .banner code { font-size:12px; opacity:.8; }
+
+  .focus { display:flex; align-items:center; justify-content:space-between; gap:24px; min-height:120px; }
+  .focus h2 { font-size:24px; line-height:1.4; }
+  .focus .due { font-size:14px; color:var(--alert); margin-top:2px; }
+  .acts { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+  .primary { border-color:var(--accent); color:var(--accent); }
+  .when { display:inline-flex; gap:6px; margin-left:8px; }
+  .when button { padding:5px 10px; font-size:13px; color:var(--text-muted); }
+  .when button[aria-pressed="true"] { background:var(--surface-sub); color:var(--text); border-color:var(--text-muted); }
+
+  .cols { display:grid; grid-template-columns:2fr 2fr 1.15fr; gap:14px; margin-top:14px; align-items:start; }
+  .item { padding:12px 0; border-top:1px solid var(--border); }
+  .item:first-of-type { border-top:0; padding-top:0; }
+  .item .head { display:flex; justify-content:space-between; gap:10px; align-items:baseline; }
+  .item .meta { font-size:14px; color:var(--text-muted); margin-top:2px; }
+  .more { font-size:14px; color:var(--text-muted); margin:12px 0 0; }
+
+  .chk { display:flex; align-items:center; gap:10px; padding:5px 0; font-size:16px; }
+  .chk input { width:17px; height:17px; accent-color:var(--done); margin:0; }
+  .chk.on span { text-decoration:line-through; color:var(--text-muted); }
+  .divider { font-size:12px; color:var(--text-muted); margin:12px 0 6px; padding-top:10px; border-top:1px solid var(--border); }
+
+  .sched { display:flex; gap:12px; padding:5px 0; }
+  .sched .t { font-size:14px; color:var(--text-muted); min-width:44px; }
+  .sched.now { background:var(--surface-sub); border-radius:6px; padding:5px 8px; margin:0 -8px; }
+
+  .empty { font-size:14px; color:var(--text-muted); padding:8px 0 4px; }
+  .empty a, .linkish { color:var(--accent); text-decoration:underline; cursor:pointer; }
+
+  .stack { margin-top:14px; display:flex; flex-direction:column; gap:14px; }
+  .nums { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+  .num { background:var(--surface-sub); border-radius:var(--r-ctrl); padding:16px 18px; }
+  .num .v { font-size:26px; font-weight:500; }
+  .bar { height:6px; border-radius:3px; background:var(--border); overflow:hidden; margin-top:10px; }
+  .bar i { display:block; height:100%; background:var(--done); }
+  .hide { display:none !important; }
+</style>
+</head>
+<body>
+
+<div class="devbar">
+  <strong style="color:var(--text);font-weight:500">見本の切替</strong>
+  <button data-s="ok"      aria-pressed="true">通常</button>
+  <button data-s="unsaved" aria-pressed="false">保存できていない</button>
+  <button data-s="nocal"   aria-pressed="false">予定が取れない</button>
+  <button data-s="empty"   aria-pressed="false">はじめて（0件）</button>
+  <span style="margin-left:auto">※ この帯は見本専用。本番にはありません</span>
+</div>
+
+<div class="wrap">
+
+  <div class="top">
+    <div class="date">9月5日（金）</div>
+    <div class="right">
+      <button id="mask">伏せる</button>
+      <span class="seg">
+        <button data-t="auto" aria-pressed="true">自動</button>
+        <button data-t="light" aria-pressed="false">明</button>
+        <button data-t="dark" aria-pressed="false">暗</button>
+      </span>
+      <span>重村雄太</span>
+      <span style="opacity:.6">build 09-05 07:12</span>
+    </div>
+  </div>
+
+  <div class="banner hide" id="bn-unsaved">
+    <span>未保存が3件あります。最後にクラウドへ保存できたのは 9:12 です。<br>
+      <code>アクセスが拒否されました（permission-denied）</code></span>
+    <button>もう一度ためす</button>
+  </div>
+
+  <!-- 今日の一点 -->
+  <div class="card focus" id="focus-normal">
+    <div>
+      <p class="sec" style="margin-bottom:6px">今日の一点</p>
+      <h2>避難訓練の準備</h2>
+      <p class="due">〆9月1日・4日超過</p>
+    </div>
+    <div style="text-align:right">
+      <div class="acts">
+        <button class="primary">終わった</button>
+        <button>手はつけた</button>
+        <span class="when">
+          <button aria-pressed="true">午前</button>
+          <button aria-pressed="false">昼</button>
+          <button aria-pressed="false">夕方</button>
+        </span>
+      </div>
+      <p class="sub" style="margin:10px 0 0">直近30日で18日</p>
+    </div>
+  </div>
+
+  <div class="card focus hide" id="focus-empty">
+    <div>
+      <p class="sec" style="margin-bottom:6px">今日の一点</p>
+      <h2 style="color:var(--text-muted);font-size:20px">まず1つだけ書いてみましょう</h2>
+      <input placeholder="例：避難訓練の準備" style="font:inherit;font-size:16px;margin-top:10px;padding:8px 12px;width:340px;border:1px solid var(--border);border-radius:var(--r-ctrl);background:var(--surface);color:var(--text)">
+    </div>
+    <div><button class="primary">これにする</button></div>
+  </div>
+
+  <div class="cols">
+
+    <!-- 返事待ち -->
+    <div class="card">
+      <p class="sec">返事待ち</p>
+      <div id="stalled-list">
+        <div class="item">
+          <div class="head"><span>内規案の確認</span><button>声をかけた</button></div>
+          <p class="meta"><span class="nm">田中先生</span>・<span class="d7">12日目</span>・9/1、9/3に連絡</p>
+        </div>
+        <div class="item">
+          <div class="head"><span>名簿の提出</span><button>声をかけた</button></div>
+          <p class="meta"><span class="nm">佐藤先生</span>・<span class="d3">6日目</span></p>
+        </div>
+        <div class="item">
+          <div class="head"><span>資料の返却</span><button>声をかけた</button></div>
+          <p class="meta"><span class="nm">鈴木先生</span>・<span class="d0">2日目</span></p>
+        </div>
+        <p class="more">ほか2件 ・ <span class="linkish">すべて見る</span></p>
+      </div>
+      <p class="empty hide" id="stalled-empty">まだありません。誰かに仕事を頼んだら、Discordのエステルに一言送ってください。</p>
+    </div>
+
+    <!-- 今日のチェック -->
+    <div class="card">
+      <p class="sec">今日のチェック</p>
+      <label class="chk on"><input type="checkbox" checked><span>メールの確認</span></label>
+      <label class="chk"><input type="checkbox"><span>メールの返信</span></label>
+      <label class="chk"><input type="checkbox"><span>ジョブカンの承認</span></label>
+      <label class="chk"><input type="checkbox"><span>タッチオンタイムの確認</span></label>
+      <label class="chk"><input type="checkbox"><span>日報の確認</span></label>
+      <p class="divider">今週</p>
+      <label class="chk"><input type="checkbox"><span>申込データの更新</span></label>
+      <p class="divider">今月</p>
+      <label class="chk"><input type="checkbox"><span>勤怠の中間確認</span></label>
+      <div style="text-align:right;margin-top:14px"><button>今日は休み</button></div>
+    </div>
+
+    <!-- 今日の予定 -->
+    <div class="card">
+      <p class="sec">今日の予定</p>
+      <div id="cal-ok">
+        <div class="sched now"><span class="t">09:00</span><span>職員朝礼</span></div>
+        <div class="sched"><span class="t">13:30</span><span>教頭会</span></div>
+        <div class="sched"><span class="t">16:00</span><span>面談・<span class="nm">満田様</span></span></div>
+      </div>
+      <div class="hide" id="cal-ng">
+        <p class="empty">予定を取得できませんでした（9/5 6:42）。<br><span class="linkish">Googleカレンダーを開く</span></p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="stack">
+
+    <div class="card" id="soon">
+      <p class="sec">そろそろ</p>
+      <div class="head" style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
+        <span>2027年度パンフレット叩き台</span>
+        <span class="sub">重要・〆切なし・<span class="d7">38日目</span></span>
+      </div>
+    </div>
+
+    <div class="card" id="tasks">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <p class="sec">やること（10件）</p><button>追加</button>
+      </div>
+      <div class="item"><div class="head"><span>配慮申請書類の作成</span><span class="sub">重要　〆9/20・あと15日</span></div></div>
+      <div class="item"><div class="head"><span>満田かなんさんに電話</span><span class="sub">重要　〆9/25・あと20日</span></div></div>
+      <div class="item"><div class="head"><span>私学教頭会内規案の作成</span><span class="sub">〆10/31・あと56日</span></div></div>
+      <div class="item"><div class="head"><span>向洋中学校 学校訪問の準備</span><span class="sub">〆切なし</span></div></div>
+      <div class="item"><div class="head"><span>10月中学校教員対象説明会：案内文作成</span><span class="sub">〆切なし</span></div></div>
+      <p class="more">ほか5件 ・ <span class="linkish">すべて見る</span></p>
+    </div>
+
+    <div class="card" id="numbers">
+      <p class="sec">数字</p>
+      <div class="nums">
+        <div class="num">
+          <p class="sub" style="margin:0 0 4px">次のイベント　11月7日（小学生）</p>
+          <p class="empty" style="padding:0">11/7の申込CSVをまだ取り込んでいません<br><span class="linkish">teacher.html を開く</span></p>
+        </div>
+        <div class="num">
+          <p class="sub" style="margin:0 0 4px">8月29日　申込</p>
+          <p class="v">121 <span class="sub">/ 目標100名</span></p>
+          <p class="sub" style="margin:4px 0 0;color:var(--done)">目標達成（中71・小50）</p>
+        </div>
+        <div class="num">
+          <p class="sub" style="margin:0 0 4px">年間　新規訪問者</p>
+          <p class="v">218 <span class="sub">/ 320名</span></p>
+          <div class="bar"><i style="width:68%"></i></div>
+        </div>
+      </div>
+      <p class="sub" style="margin:12px 0 0">最終更新 9月3日（2日前）</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+
+  $$('.seg button').forEach(b => b.onclick = () => {
+    $$('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    const t = b.dataset.t;
+    document.documentElement.dataset.theme = t === 'auto' ? 'auto' : t;
+  });
+
+  $$('.when button').forEach(b => b.onclick = () => {
+    $$('.when button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  });
+
+  $$('.chk input').forEach(i => i.onchange = () => i.closest('.chk').classList.toggle('on', i.checked));
+
+  let masked = false;
+  $('#mask').onclick = () => {
+    masked = !masked;
+    $$('.nm').forEach(n => n.classList.toggle('masked', masked));
+    $('#mask').textContent = masked ? '表示する' : '伏せる';
+  };
+
+  const states = {
+    ok:      () => {},
+    unsaved: () => $('#bn-unsaved').classList.remove('hide'),
+    nocal:   () => { $('#cal-ok').classList.add('hide'); $('#cal-ng').classList.remove('hide'); },
+    empty:   () => {
+      $('#focus-normal').classList.add('hide');
+      $('#focus-empty').classList.remove('hide');
+      $('#stalled-list').classList.add('hide');
+      $('#stalled-empty').classList.remove('hide');
+      $('#soon').classList.add('hide');
+      $('#tasks').classList.add('hide');
+      $('#numbers').classList.add('hide');
+    }
+  };
+  $$('.devbar button').forEach(b => b.onclick = () => {
+    $$('.devbar button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    ['#bn-unsaved'].forEach(s => $(s).classList.add('hide'));
+    $('#cal-ok').classList.remove('hide'); $('#cal-ng').classList.add('hide');
+    $('#focus-normal').classList.remove('hide'); $('#focus-empty').classList.add('hide');
+    $('#stalled-list').classList.remove('hide'); $('#stalled-empty').classList.add('hide');
+    ['#soon','#tasks','#numbers'].forEach(s => $(s).classList.remove('hide'));
+    states[b.dataset.s]();
+  });
+</script>
+</body>
+</html>

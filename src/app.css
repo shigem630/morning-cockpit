@@ -1,0 +1,83 @@
+/* 画面固有のスタイル。デザイントークンは tokens.css。 */
+
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 48px; }
+
+/* ───── TopBar ───── */
+.top { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0; }
+.top .date { display:flex; align-items:center; gap:10px; font-size:16px; font-weight:500; }
+.top .date::before { content:""; width:3px; height:18px; background:var(--accent); border-radius:2px; }
+.top .right { display:flex; align-items:center; gap:12px; font-size:13px; color:var(--text-muted); }
+.seg { display:inline-flex; border:1px solid var(--border); border-radius:var(--r-ctrl); overflow:hidden; }
+.seg button { border:0; border-radius:0; padding:4px 10px; font-size:13px; }
+.seg button[aria-pressed="true"] { background:var(--text); color:var(--surface); }
+.build { opacity:.6; font-variant-numeric: tabular-nums; }
+
+/* ───── 失敗時の帯。トーストは見逃せるので使わない ───── */
+.banner {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  border:1px solid var(--alert); background:var(--surface); color:var(--alert);
+  border-radius:var(--r-ctrl); padding:10px 16px; margin-bottom:14px; font-size:14px;
+}
+.banner.warn { border-color:var(--warn); color:var(--warn); }
+.banner code { font-size:12px; opacity:.85; }
+.banner > div { min-width:0; }
+
+/* ───── 今日の最優先 ───── */
+.focus { display:flex; align-items:center; justify-content:space-between; gap:24px; min-height:120px; }
+.focus h2 { font-size:24px; line-height:1.4; }
+.focus .due { font-size:14px; margin-top:2px; color:var(--text-muted); }
+.focus .due.over { color:var(--alert); }
+.acts { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+.primary { border-color:var(--accent); color:var(--accent); }
+button[aria-pressed="true"].primary { background:var(--accent); color:#fff; }
+.when { display:inline-flex; gap:6px; margin-left:8px; }
+.when button { padding:5px 10px; font-size:13px; color:var(--text-muted); }
+.when button[aria-pressed="true"] { background:var(--surface-sub); color:var(--text); border-color:var(--text-muted); }
+.textin {
+  font:inherit; font-size:16px; padding:8px 12px; width:340px; max-width:100%;
+  border:1px solid var(--border); border-radius:var(--r-ctrl);
+  background:var(--surface); color:var(--text);
+}
+
+/* ───── 3列 ───── */
+.cols { display:grid; grid-template-columns:2fr 2fr 1.15fr; gap:14px; margin-top:14px; align-items:start; }
+.item { padding:12px 0; border-top:1px solid var(--border); }
+.item:first-of-type { border-top:0; padding-top:0; }
+.item .head { display:flex; justify-content:space-between; gap:10px; align-items:baseline; }
+.item .meta { font-size:14px; color:var(--text-muted); margin-top:2px; }
+.more { font-size:14px; color:var(--text-muted); margin:12px 0 0; }
+.title-1line { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.chk { display:flex; align-items:center; gap:10px; padding:5px 0; font-size:16px; cursor:pointer; }
+.chk input { width:17px; height:17px; accent-color:var(--done); margin:0; }
+.chk.on span { text-decoration:line-through; color:var(--text-muted); }
+.divider { font-size:12px; color:var(--text-muted); margin:12px 0 6px; padding-top:10px; border-top:1px solid var(--border); }
+
+.sched { display:flex; gap:12px; padding:5px 0; }
+.sched .t { font-size:14px; color:var(--text-muted); min-width:44px; font-variant-numeric: tabular-nums; }
+.sched.now { background:var(--surface-sub); border-radius:6px; padding:5px 8px; margin:0 -8px; }
+.sched.marked { box-shadow: inset 2px 0 0 var(--accent); padding-left:8px; margin-left:-8px; }
+
+.empty { font-size:14px; color:var(--text-muted); padding:8px 0 4px; }
+.linkish {
+  color:var(--accent); text-decoration:underline; cursor:pointer;
+  background:none; border:0; padding:0; font:inherit; font-size:inherit;
+}
+
+.stack { margin-top:14px; display:flex; flex-direction:column; gap:14px; }
+.rowbar { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+
+.exits { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+
+/* ───── ログイン画面 ───── */
+.gate { max-width:420px; margin:14vh auto; text-align:center; }
+.gate h1 { font-size:22px; margin-bottom:10px; }
+.gate .card { margin-top:22px; text-align:left; }
+.gate button.primary { font-size:16px; padding:10px 22px; }
+
+/* ───── スマホ ───── */
+.toonarrow { display:none; }
+@media (max-width: 1023px) {
+  .desktop-only { display:none; }
+  .toonarrow { display:block; padding:40px 24px; font-size:16px; line-height:1.9; }
+}
