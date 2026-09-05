@@ -27,21 +27,43 @@ Chrome 152 / Windows 10・学校ネットワーク。**全項目クリア。設�
 - ⑤ **職場PCのChromeは denikin630@gmail.com でログイン済み ← 最重要項目が○**
   学校のWorkspaceアカウントは出てこなかった（学校はGoogle Workspaceではない可能性）
 
+## ステップ1（Firebase設定）完了 — 2026/9/5 13時ごろ
+- プロジェクト: **morning-cockpit-38e47**（Spark無料枠 / daily-report-checker-6f619 とは完全に別）
+- Firestore: asia-northeast1（東京）/ Standard / Firestoreネイティブ / リアルタイム更新 有効
+- Authentication: **Googleのみ**有効。公開名 morning-cockpit / サポートメール denikin630@gmail.com
+- 承認済みドメイン: localhost, *.firebaseapp.com, *.web.app, **shigem630.github.io**
+- **UID: BLSiEWp64fWQesZMUd1XRMPQiFg2**（denikin630@gmail.com）
+- ルール: firestore.rules に記載。cockpit/** を上記UIDのみ許可。他は全拒否。9/5 12:49公開
+- APIキー(Browser key) リファラ制限4件:
+  https://shigem630.github.io/* / https://morning-cockpit-38e47.firebaseapp.com/*
+  https://morning-cockpit-38e47.web.app/* / http://localhost:5173/*
+  ※ APIの制限（25個のAPI）はFirebaseが自動設定。触らない
+- 検証: 制限適用後にログアウト→再ログイン→書き込み→読み返し すべて成功
+- 設定値は uid/index.html の firebaseConfig にそのまま入っている（webのapiKeyは公開前提の値）
+- 確認用ページ: /uid/ （ログイン・UID表示・書き込みテスト。ステップ2完了後に削除してよい）
+
+## 先生の予定はGoogleカレンダー5本に分散している（④が空だった理由）
+~/esthel-discord-bot/gcal.mjs の CAL より。すべて denikin630@gmail.com 配下。
+  仕事 / 仕事(対人) / 〆切 / 雄太と望美 / primary(=denikin630@gmail.com、ほぼ空)
+接続チェックの埋め込み枠はカレンダー未指定だったため primary だけを見ていた。予定は存在する。
+→ TodaySchedule はカレンダーIDを指定して複数本を読む必要がある。
+
 # 未解決の論点（ステップ2の前に決める）
-- **今日の予定をどこから取るか。** ④で個人カレンダーが空だった。先生の実際の予定
-  （職員朝礼・教頭会・面談）が denikin630@gmail.com のGoogleカレンダーに
-  入っていないなら、TodaySchedule は常に空になる。予定の実際の置き場所を先生に確認する。
+- **今日の予定をどう取るか。** 予定の在処は判明済み（上記5本）。取り方が未決。
+  A) ブラウザから Calendar API を直接読む。Firebase の GoogleAuthProvider に
+     calendar.readonly スコープを追加してアクセストークンを得る。
+     欠点: トークンが1時間で切れる（Firebaseはリフレッシュトークンを渡さない）。
+     朝開いて使う用途なら実用上は足りる。切れたら「予定を取得できません・再ログイン」を出す。
+     未確認: 機密スコープのため OAuth 同意画面に「確認されていません」警告が出る可能性。
+  B) エステルが毎朝 Firestore に当日の予定を書き込む。自宅Macが動いていないと出ない。
+  C) ステップ2では予定欄を保留し、他を先に作る。
 
 # 次の作業
-ステップ1（Firebase新規プロジェクト作成・先生の手作業10分）
- 1a 新規プロジェクト作成（denikin630@gmail.com で）
- 1b Googleログインのみ有効化
- 1c 承認済みドメインに shigem630.github.io を追加 ← 忘れると auth/unauthorized-domain
- 1d ウェブアプリ登録 → 設定値(apiKey/authDomain/projectId/appId)を取得
- 1e 初回ログインでUIDを確認（そのための最小ログインページを /uid/ に作る）
- 1f そのUIDでセキュリティルールを記述
- 1g APIキーにHTTPリファラ制限（shigem630.github.io/* と localhost:*）
- 1h リポジトリ設定 Pages → Source を「GitHub Actions」に切り替え
+ステップ1は完了。次はステップ2。
+**先生の手作業が1つ残っている: リポジトリ設定 Pages → Source を「GitHub Actions」に切り替え。**
+ただし切り替えるのは deploy ワークフローを push した直後にする。先に切り替えると
+/uid/ /mockup/ が消えて公開URLが404になる。Vite の public/ に mockup と uid を移し、
+dist に含めてから切り替えること。/check/ は役目を終えたので削除してよい。
 → ステップ2（骨格公開＋やることリスト10件の投入＋ブラウザ起動ページとStream Deck設定を同日に）
 → ステップ2と同時：エステルの SKILL.md 手順7から「番号振り直し＋書き戻し」を削除
 
