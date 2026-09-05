@@ -61,6 +61,19 @@ function useCollection<T>(
 export function useTasks() { return useCollection<Task>(tasksCol, 'tasks'); }
 export function useStalled() { return useCollection<Stalled>(stalledCol, 'stalled'); }
 
+/** 前日の記録だけを読む（今朝の候補を決めるのに使う。書き込みはしない） */
+export function useYesterdayLog(date: YMD): DayLog | null {
+  const [log, setLog] = useState<DayLog | null>(null);
+  useEffect(() => {
+    const un = onSnapshot(logDoc(date), (snap) => {
+      const raw = (snap.data() as Partial<DayLog> | undefined) ?? null;
+      setLog(raw ? { ...raw, checked: raw.checked ?? [] } : null);
+    }, () => setLog(null));
+    return un;
+  }, [date]);
+  return log;
+}
+
 export function useDayLog(date: YMD): [DayLog, SyncState] {
   const [log, setLog] = useState<DayLog>({ checked: [] });
   const [sync, setSync] = useState<SyncState>(initialSync);

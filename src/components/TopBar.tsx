@@ -10,6 +10,8 @@ interface Props {
   onMask: () => void;
   userName: string;
   onLogout: () => void;
+  onExport: () => void;
+  exporting: boolean;
 }
 
 export default function TopBar(p: Props) {
@@ -31,6 +33,10 @@ export default function TopBar(p: Props) {
             </button>
           ))}
         </span>
+        <button onClick={p.onExport} disabled={p.exporting}
+          title="いまのデータを全部ファイルに書き出します（バックアップ）">
+          {p.exporting ? '書き出し中…' : '書き出す'}
+        </button>
         <span>{p.userName}</span>
         <button onClick={p.onLogout}>出る</button>
         <span className="build">build {__BUILD_TIME__}</span>

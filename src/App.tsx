@@ -2,15 +2,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth, clearCalendarToken, getCalendarToken, login, logout } from './firebase';
 import {
-  detectClockSkew, isBusinessDay, logicalToday, type YMD,
+  addDays, detectClockSkew, isBusinessDay, logicalToday, type YMD,
 } from './lib/dates';
 import { eligibleRoutines, last30Days } from './lib/eligible';
 import { isOpen, sortTasks } from './lib/priority';
 import {
   addStalled, addTask, nudge, reopenStalled, resolveStalled, restoreTask, setFocus,
-  setWorked, toggleCheck, unnudge, updateTask, useDayLog, useRecentLogs, useStalled, useTasks,
+  setWorked, toggleCheck, unnudge, updateTask, useDayLog, useRecentLogs, useStalled,
+  useTasks, useYesterdayLog,
 } from './lib/store';
 import { CalendarApiError, fetchTodayEvents, NoTokenError } from './lib/calendar';
+import { buildBackup, downloadJson } from './lib/export';
 import { INITIAL_TASKS } from './data/initialTasks';
 import type { Stalled, WhenTag } from './types';
 import SectionTitle from './components/SectionTitle';
@@ -111,7 +113,21 @@ function Cockpit({ user }: { user: User }) {
   /* ───── 今日の最優先 ───── */
   const [skip, setSkip] = useState(0);
   const chosen = openTasks.find((t) => t.id === log.focusTaskId) ?? null;
-  const candidate = openTasks.length ? openTasks[skip % openTasks.length] : null;
+
+  // 昨日「手はつけた」で終わった仕事は、今朝いちばんの候補にする。
+  // 手をつけたものを翌日に忘れるのが、いちばんもったいない。
+  const yLog = useYesterdayLog(addDays(today, -1));
+  const carriedOver = useMemo(() => {
+    if (yLog?.focusResult !== 'started' || !yLog.focusTaskId) return null;
+    return openTasks.find((t) => t.id === yLog.focusTaskId) ?? null;
+  }, [yLog, openTasks]);
+
+  // 候補の並び。積み残しがあれば先頭に置き、「別のにする」で普通の順に移る。
+  const candidates = useMemo(() => {
+    if (!carriedOver) return openTasks;
+    return [carriedOver, ...openTasks.filter((t) => t.id !== carriedOver.id)];
+  }, [carriedOver, openTasks]);
+  const candidate = candidates.length ? candidates[skip % candidates.length] : null;
 
   const streak = useMemo(() => {
     const days = last30Days(today);
@@ -212,6 +228,21 @@ function Cockpit({ user }: { user: User }) {
     return () => window.removeEventListener('unhandledrejection', onRej);
   }, []);
 
+  /* ───── 書き出し（バックアップ） ───── */
+  const [exporting, setExporting] = useState(false);
+  const doExport = async () => {
+    setExporting(true);
+    try {
+      const data = await buildBackup(today);
+      downloadJson(data, `morning-cockpit-${today}.json`);
+    } catch (e) {
+      const r = e as { code?: string; message?: string };
+      setCrash(`書き出しに失敗しました： ${r.code ?? ''} ${r.message ?? String(e)}`);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   /* ───── 操作 ───── */
   const eligibleIds = eligible.map((r) => r.id);
 
@@ -249,6 +280,7 @@ function Cockpit({ user }: { user: User }) {
           masked={masked} onMask={() => setMasked((v) => !v)}
           userName={user.displayName ?? user.email ?? ''}
           onLogout={() => logout()}
+          onExport={doExport} exporting={exporting}
         />
 
         <SyncBanner syncs={[tasksSync, stalledSync, logSync]} onRetry={() => location.reload()} />
@@ -290,7 +322,7 @@ function Cockpit({ user }: { user: User }) {
         {tasks.length === 0 ? null : (
           <FocusCard
             today={today} candidate={candidate} chosen={chosen} log={log}
-            hasAnyTask={openTasks.length > 0} streak={streak}
+            hasAnyTask={openTasks.length > 0} streak={streak} carriedOver={carriedOver}
             onChoose={(id) => setFocus(today, { focusTaskId: id, focusResult: null })}
             onSkip={() => setSkip((s) => s + 1)}
             onResult={(r) => {

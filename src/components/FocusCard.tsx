@@ -10,6 +10,8 @@ interface Props {
   chosen: Task | null;         // 今日の1件として選ばれているもの
   log: DayLog;
   hasAnyTask: boolean;
+  /** 昨日「手はつけた」で終わった仕事。今朝の候補として先に出す。 */
+  carriedOver: Task | null;
   streak: { hit: number; of: number };
   onChoose: (id: string) => void;
   onSkip: () => void;
@@ -49,11 +51,15 @@ export default function FocusCard(p: Props) {
   // まだ今日の1件を決めていない。候補は3件ではなく1件。否定だけを操作にする。
   if (!p.chosen) {
     const c = p.candidate;
+    const carried = p.carriedOver && c && p.carriedOver.id === c.id;
     return (
       <div className="card focus">
         <div>
           <SectionTitle>今日の最優先</SectionTitle>
           <h2>{c ? c.title : '選べるものがありません'}</h2>
+          {carried && (
+            <p className="sub" style={{ margin: '2px 0 0' }}>昨日、手をつけた続きです</p>
+          )}
           {c && dueLabel(c, p.today) && (
             <p className={`due${dueLabel(c, p.today)!.over ? ' over' : ''}`}>
               {dueLabel(c, p.today)!.text}
