@@ -1,0 +1,23 @@
+rules_version = '2';
+
+// 朝の司令塔（morning-cockpit）
+// プロジェクト: morning-cockpit-38e47
+// 方針: メールアドレスではなく UID で固定する。
+//       メールは変わりうる識別子（職場が Workspace アカウントを配れば終わる）。
+// 設定日: 2026-09-05
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 重村先生のアカウントだけが、cockpit 以下を読み書きできる。
+    match /cockpit/{document=**} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == 'BLSiEWp64fWQesZMUd1XRMPQiFg2';
+    }
+
+    // それ以外の場所は一切拒否（既定でも拒否だが、意図として明示する）
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
