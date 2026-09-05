@@ -88,7 +88,7 @@ const HOSTS = [
   ['ログインの継続',          'probe',        'https://securetoken.googleapis.com/',            '×だと1時間で保存できなくなります'],
   ['データの保存先',          'firestore',    '',                                               '×だと何も保存できません'],
   ['ログイン画面',            'probe',        'https://accounts.google.com/',                   'ログインの途中で使います'],
-  ['ログインの補助',          'probe',        'https://apis.google.com/',                       'ログインの途中で使います'],
+  ['ログインの補助',          'probe',        'https://apis.google.com/js/api.js',              'ログインの途中で使います'],
 ];
 const T = document.getElementById('tests');
 const OUT = document.getElementById('out');
