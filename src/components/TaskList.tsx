@@ -1,20 +1,33 @@
 import { useState } from 'react';
 import type { Task } from '../types';
-import { dueLabel } from '../lib/priority';
+import { dueLabel, isUrgent } from '../lib/priority';
 import { dayCount, type YMD } from '../lib/dates';
 import SectionTitle from './SectionTitle';
 
 interface Props {
   today: YMD;
   tasks: Task[];      // 並び替え済み・未完了のみ
-  closed: Task[];     // 終わった・消したもの（論理削除なので戻せる）
+  closed: Task[];     // 終わった・やらないことにしたもの（論理削除なので戻せる）
+  /** 自分で並べている状態か。true のときだけ「自動の順に戻す」を出す。 */
+  manual: boolean;
   onAdd: (title: string, important: boolean, dueDate?: YMD) => void;
   onDone: (id: string) => void;
   onDelete: (id: string) => void;
   onRestore: (id: string) => void;
+  /** dir は -1 が上、+1 が下。並べ替えは呼び出し側で全件に番号を振り直す。 */
+  onMove: (index: number, dir: -1 | 1) => void;
+  onAuto: () => void;
 }
 
 const VISIBLE = 5;
+
+/** 〆切の切迫。色は3段階まで。赤を増やすと、どれも急ぎに見えて効かなくなる。 */
+function dueClass(t: Task, today: YMD): string {
+  const d = dueLabel(t, today);
+  if (!d) return 'due-none';
+  if (d.over) return 'due-over';
+  return isUrgent(t, today) ? 'due-soon' : 'due-far';
+}
 
 export default function TaskList(p: Props) {
   const [expanded, setExpanded] = useState(false);
@@ -26,6 +39,7 @@ export default function TaskList(p: Props) {
 
   const shown = expanded ? p.tasks : p.tasks.slice(0, VISIBLE);
   const hidden = p.tasks.length - shown.length;
+  const last = p.tasks.length - 1;
 
   const submit = () => {
     if (!title.trim()) return;
@@ -37,12 +51,19 @@ export default function TaskList(p: Props) {
     <div className="card">
       <div className="rowbar">
         <SectionTitle note={`全${p.tasks.length}件`}>やること</SectionTitle>
-        <button onClick={() => setAdding((v) => !v)}>{adding ? 'やめる' : '追加'}</button>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          {p.manual && (
+            <button className="linkish" onClick={p.onAuto}>自動の順に戻す</button>
+          )}
+          <button onClick={() => setAdding((v) => !v)}>{adding ? 'やめる' : '追加'}</button>
+        </span>
       </div>
 
       {p.tasks.length > 0 && (
         <p className="legend">
-          <b>終わった</b>＝やり切った　／　<b>やらない</b>＝やらずに一覧から外す　
+          上から順に。<b>↑↓</b>で入れ替えられます
+          {p.manual ? '（今は自分で並べた順）' : '（今は重要・急ぎの順）'}　／　
+          <b>終わった</b>＝やり切った　<b>やらない</b>＝やらずに一覧から外す
           （どちらも下の記録から戻せます）
         </p>
       )}
@@ -65,16 +86,25 @@ export default function TaskList(p: Props) {
 
       {p.tasks.length === 0 && <p className="empty">やることはありません。</p>}
 
-      {shown.map((t) => {
+      {shown.map((t, i) => {
         const d = dueLabel(t, p.today);
         return (
-          <div className="item" key={t.id}>
+          <div className="item task" key={t.id}>
             <div className="head">
-              <span className="title-1line" title={t.title}>{t.title}</span>
-              <span className="sub" style={{ whiteSpace: 'nowrap' }}>
-                {t.important && '重要　'}
-                {d ? d.text : '〆切なし'}
+              <span className="left">
+                <span className={`rank${i < 3 ? ' top' : ''}`}>{i + 1}</span>
+                <span className="tname title-1line" title={t.title}>{t.title}</span>
+              </span>
+              <span className="sub right">
+                {t.important && <b className="badge">重要</b>}
+                <span className={dueClass(t, p.today)}>{d ? d.text : '〆切なし'}</span>
                 <span className="rowacts">
+                  <button className="act mv" disabled={i === 0}
+                    aria-label="上へ動かす" title="上へ動かす"
+                    onClick={() => p.onMove(i, -1)}>↑</button>
+                  <button className="act mv" disabled={i === last}
+                    aria-label="下へ動かす" title="下へ動かす"
+                    onClick={() => p.onMove(i, 1)}>↓</button>
                   <button className="act ok" onClick={() => p.onDone(t.id)}
                     title="やり切ったものとして一覧から外します。あとで戻せます。">終わった</button>
                   <button className="act" onClick={() => p.onDelete(t.id)}

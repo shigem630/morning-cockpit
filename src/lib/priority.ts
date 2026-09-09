@@ -17,8 +17,19 @@ export function rank(t: Task, today: YMD): number {
   return imp + urg;
 }
 
+/** 自分で並べたものが1つでもあるか。あれば「手で並べている」状態とみなす。 */
+export function isManualOrder(tasks: Task[]): boolean {
+  return tasks.some((t) => typeof t.order === 'number');
+}
+
 export function sortTasks(tasks: Task[], today: YMD): Task[] {
   return [...tasks].sort((a, b) => {
+    // 自分で並べたものが最優先。自動の理屈で勝手に追い越さない。
+    const ao = a.order, bo = b.order;
+    if (typeof ao === 'number' && typeof bo === 'number') return ao - bo;
+    if (typeof ao === 'number') return -1;
+    if (typeof bo === 'number') return 1;
+
     const r = rank(a, today) - rank(b, today);
     if (r !== 0) return r;
     if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);

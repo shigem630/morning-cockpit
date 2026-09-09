@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import {
   arrayRemove, arrayUnion, collection, deleteField, doc, onSnapshot, setDoc, updateDoc,
+  writeBatch,
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import type { DayLog, Stalled, Task } from '../types';
@@ -175,6 +176,21 @@ export async function addTask(t: Omit<Task, 'id'>) {
 
 export async function updateTask(id: string, patch: Partial<Task>) {
   await updateDoc(doc(tasksCol(), id), patch);
+}
+
+/** 並べ替え。見えている順そのままに 1,2,3… を振り直して、まとめて1回で書く。
+    1件ずつ書くと、途中で失敗したときに順番が混ざったまま残る。 */
+export async function reorderTasks(idsInOrder: string[]) {
+  const b = writeBatch(db);
+  idsInOrder.forEach((id, i) => b.update(doc(tasksCol(), id), { order: i + 1 }));
+  await b.commit();
+}
+
+/** 自動の順に戻す。order を消すだけで、仕事そのものには触らない。 */
+export async function clearTaskOrder(ids: string[]) {
+  const b = writeBatch(db);
+  ids.forEach((id) => b.update(doc(tasksCol(), id), { order: deleteField() }));
+  await b.commit();
 }
 
 export async function addStalled(s: Omit<Stalled, 'id'>) {

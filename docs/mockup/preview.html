@@ -167,7 +167,26 @@ button:hover { background: var(--surface-sub); }
   .sched.now { background:var(--surface-sub); border-radius:6px; padding:5px 8px; margin:0 -8px; }
 
   .empty { font-size:14px; color:var(--text-muted); padding:8px 0 4px; }
-  .empty a, .legend { font-size:12px; color:var(--text-muted); margin:0 0 14px; }
+  .empty a, .item.task .head { align-items:center; gap:14px; }
+.item.task .left { display:flex; align-items:baseline; gap:12px; min-width:0; flex:1 1 auto; }
+.item.task .right { display:flex; align-items:center; gap:10px; flex:none; white-space:nowrap; }
+.rank { flex:none; width:20px; text-align:right; font-size:13px; font-variant-numeric:tabular-nums; color:var(--text-muted); }
+.rank.top { color:var(--text); font-weight:700; }
+.tname { font-size:16px; color:var(--text); min-width:0; }
+.badge {
+  font-size:11px; font-weight:700; letter-spacing:.04em; line-height:1.7;
+  padding:0 8px; border-radius:999px;
+  color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, var(--surface));
+  border:1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+}
+.due-over { color:var(--alert); font-weight:700; }
+.due-soon { color:var(--warn);  font-weight:500; }
+.due-far  { color:var(--text-muted); }
+.due-none { color:var(--text-muted); }
+.act.mv { padding:0 8px; font-size:13px; }
+.act:disabled { opacity:.3; cursor:default; }
+.stale { font-size:12px; color:var(--warn); margin:0 0 10px; }
+.legend { font-size:12px; color:var(--text-muted); margin:0 0 14px; }
 .legend b { font-weight:600; color:var(--text); }
 .rowacts { display:inline-flex; gap:6px; margin-left:14px; vertical-align:middle; }
 .act {
@@ -322,13 +341,14 @@ button:hover { background: var(--surface-sub); }
         <p class="sec">やること<span class="note">全10件</span></p><button>追加</button>
       </div>
       <p class="legend">
-        <b>終わった</b>＝やり切った　／　<b>やらない</b>＝やらずに一覧から外す　（どちらも下の記録から戻せます）
+        上から順に。<b>↑↓</b>で入れ替えられます（今は重要・急ぎの順）　／　
+        <b>終わった</b>＝やり切った　<b>やらない</b>＝やらずに一覧から外す（どちらも下の記録から戻せます）
       </p>
-      <div class="item"><div class="head"><span>配慮申請書類の作成</span><span class="sub">重要　〆9/20・あと15日<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item"><div class="head"><span>満田かなんさんに電話</span><span class="sub">重要　〆9/25・あと20日<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item"><div class="head"><span>私学教頭会内規案の作成</span><span class="sub">〆10/31・あと56日<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item"><div class="head"><span>向洋中学校 学校訪問の準備</span><span class="sub">〆切なし<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item"><div class="head"><span>10月中学校教員対象説明会：案内文作成</span><span class="sub">〆切なし<span class="rowacts"><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="rank top">1</span><span class="tname title-1line">配慮申請書類の作成</span></span><span class="sub right"><b class="badge">重要</b><span class="due-far">〆9/20・あと15日</span><span class="rowacts"><button class="act mv" disabled>↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="rank top">2</span><span class="tname title-1line">満田かなんさんに電話</span></span><span class="sub right"><b class="badge">重要</b><span class="due-far">〆9/25・あと20日</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="rank top">3</span><span class="tname title-1line">私学教頭会内規案の作成</span></span><span class="sub right"><span class="due-far">〆10/31・あと56日</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="rank">4</span><span class="tname title-1line">向洋中学校 学校訪問の準備</span></span><span class="sub right"><span class="due-none">〆切なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="rank">5</span><span class="tname title-1line">10月中学校教員対象説明会：案内文作成</span></span><span class="sub right"><span class="due-none">〆切なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv" disabled>↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
       <p class="more">ほか5件 ・ <span class="linkish">すべて見る</span></p>
     </div>
 

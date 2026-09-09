@@ -5,13 +5,15 @@ import {
   addDays, detectClockSkew, isBusinessDay, logicalToday, type YMD,
 } from './lib/dates';
 import { eligibleRoutines, last30Days } from './lib/eligible';
-import { isOpen, sortTasks } from './lib/priority';
+import { isManualOrder, isOpen, sortTasks } from './lib/priority';
 import {
-  addStalled, addTask, clearFocus, nudge, reopenStalled, resolveStalled, restoreTask, setFocus,
-  setWorked, toggleCheck, unnudge, updateTask, useDayLog, useRecentLogs, useStalled,
-  useTasks, useYesterdayLog,
+  addStalled, addTask, clearFocus, clearTaskOrder, nudge, reopenStalled, reorderTasks,
+  resolveStalled, restoreTask, setFocus, setWorked, toggleCheck, unnudge, updateTask,
+  useDayLog, useRecentLogs, useStalled, useTasks, useYesterdayLog,
 } from './lib/store';
-import { CalendarApiError, fetchTodayEvents, NoTokenError } from './lib/calendar';
+import {
+  CalendarApiError, fetchTodayEvents, NoTokenError, readCalendarCache, saveCalendarCache,
+} from './lib/calendar';
 import { buildBackup, downloadJson } from './lib/export';
 import { INITIAL_TASKS } from './data/initialTasks';
 import type { Stalled, WhenTag } from './types';
@@ -168,7 +170,8 @@ function Cockpit({ user }: { user: User }) {
     setCal({ kind: 'loading' });
     try {
       const events = await fetchTodayEvents(today);
-      setCal({ kind: 'ok', events, at: new Date() });
+      saveCalendarCache(today, events);
+      setCal({ kind: 'ok', events, at: new Date(), live: true });
     } catch (e) {
       if (e instanceof NoTokenError) {
         // 手元のトークンが古い。捨てておけば、次に押したときログインからやり直せる。
@@ -185,6 +188,37 @@ function Cockpit({ user }: { user: User }) {
         setCal({ kind: 'error', message: (e as Error).message, at: new Date() });
       }
     }
+  }, [today]);
+
+  /* ───── 開いた時点で、押さなくても予定を出す ─────
+     ①手元に残っている今日のぶんをすぐ出す（更新のたびに空になるのをやめる）
+     ②読む許可が生きていれば、黙って取り直して差し替える
+     許可が切れているときに、こちらからログイン窓を開くことはしない。
+     押していないのに窓が出るのは、本人にとって「壊れた」に見える。 */
+  useEffect(() => {
+    const cached = readCalendarCache(today);
+    if (cached) {
+      setCal({ kind: 'ok', events: cached.events, at: new Date(cached.at), live: false });
+    }
+    if (!getCalendarToken()) return;
+
+    let alive = true;
+    fetchTodayEvents(today)
+      .then((events) => {
+        if (!alive) return;
+        saveCalendarCache(today, events);
+        setCal({ kind: 'ok', events, at: new Date(), live: true });
+      })
+      .catch((e) => {
+        // 手元に写しがあるなら、それを出したまま黙る（「◯時点の写し」と出ている）。
+        // 何も無いときだけ、理由を画面に出す。握りつぶさない。
+        if (!alive || cached) return;
+        if (e instanceof NoTokenError) { clearCalendarToken(); setCal({ kind: 'notoken' }); }
+        else if (e instanceof CalendarApiError) {
+          setCal({ kind: 'error', message: `HTTP ${e.status}`, advice: e.advice, at: new Date() });
+        }
+      });
+    return () => { alive = false; };
   }, [today]);
 
   /* ───── キーボード ───── */
@@ -243,6 +277,32 @@ function Cockpit({ user }: { user: User }) {
     } finally {
       setExporting(false);
     }
+  };
+
+  /* ───── やることの並び替え ───── */
+  const manual = useMemo(() => isManualOrder(openTasks), [openTasks]);
+
+  // 見えている順そのままに番号を振り直す。差分だけ書くと、自動順から手動順へ
+  // 移った最初の1回で、触っていないものの順番が決まらない。
+  const moveTask = (index: number, dir: -1 | 1) => {
+    const j = index + dir;
+    if (j < 0 || j >= openTasks.length) return;
+    const next = [...openTasks];
+    [next[index], next[j]] = [next[j], next[index]];
+    reorderTasks(next.map((t) => t.id));
+  };
+
+  const backToAuto = () => {
+    const ids = tasks.filter((t) => typeof t.order === 'number').map((t) => t.id);
+    if (ids.length) clearTaskOrder(ids);
+  };
+
+  // 手で並べている間に足したものは、いちばん上に出す。
+  // 下に付けると、長い一覧の末尾に埋もれて、足したことごと忘れる。
+  const nextTopOrder = () => {
+    if (!manual) return undefined;
+    const os = openTasks.map((t) => t.order).filter((o): o is number => typeof o === 'number');
+    return (os.length ? Math.min(...os) : 1) - 1;
   };
 
   /* ───── 操作 ───── */
@@ -367,8 +427,11 @@ function Cockpit({ user }: { user: User }) {
             <SoonCard today={today} task={soon} />
             <TaskList
               today={today} tasks={openTasks} closed={closedTasks}
+              manual={manual} onMove={moveTask} onAuto={backToAuto}
               onAdd={(title, important, dueDate) =>
-                addTask({ title, important, dueDate, createdAt: today })}
+                addTask({
+                  title, important, dueDate, createdAt: today, order: nextTopOrder(),
+                })}
               onDone={(id) => updateTask(id, { doneAt: today })}
               onDelete={(id) => updateTask(id, { deletedAt: today })}
               onRestore={(id) => restoreTask(id)}

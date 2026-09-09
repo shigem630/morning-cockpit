@@ -18,6 +18,37 @@ export interface CalEvent {
   calendar: string;
 }
 
+/* ───────── 読んだ予定を手元に残す ─────────
+   ページを更新するたびにボタンを押し直すのが煩わしい、という指摘への対処。
+   予定そのものは秘密ではないが、他人の名前が入るので端末の中だけに置く。
+   日付が変わったぶんは読まない（前日の予定を今日として出さないため）。 */
+
+const CACHE_KEY = 'mc.cal';
+
+export interface CachedEvents {
+  date: YMD;
+  at: number;          // 取り出した時刻（ミリ秒）
+  events: CalEvent[];
+}
+
+export function saveCalendarCache(date: YMD, events: CalEvent[]) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ date, at: Date.now(), events }));
+  } catch { /* 保存できない環境では、今まで通り毎回読むだけ。困らせない */ }
+}
+
+export function readCalendarCache(date: YMD): CachedEvents | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const c = JSON.parse(raw) as Partial<CachedEvents>;
+    if (c.date !== date || !Array.isArray(c.events) || typeof c.at !== 'number') return null;
+    return c as CachedEvents;
+  } catch {
+    return null;   // 壊れていたら無かったことにする。画面は止めない
+  }
+}
+
 export class NoTokenError extends Error {
   constructor() { super('カレンダーのトークンがありません'); }
 }

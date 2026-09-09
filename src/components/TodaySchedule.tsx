@@ -5,7 +5,9 @@ import SectionTitle from './SectionTitle';
 export type CalState =
   | { kind: 'idle' }
   | { kind: 'loading' }
-  | { kind: 'ok'; events: CalEvent[]; at: Date }
+  // live=false は「手元に残っていたぶんを出している」。時刻を必ず添えて、
+  // 今この瞬間の予定であるかのようには見せない。
+  | { kind: 'ok'; events: CalEvent[]; at: Date; live: boolean }
   | { kind: 'notoken' }
   | { kind: 'error'; message: string; advice?: string | null; at: Date };
 
@@ -64,6 +66,13 @@ export default function TodaySchedule({ state, nowHHMM, when, onLoad }: Props) {
 
       {state.kind === 'ok' && state.events.length === 0 && (
         <p className="empty">今日の予定はありません（{hhmm(state.at)}時点）。</p>
+      )}
+
+      {state.kind === 'ok' && !state.live && (
+        <p className="stale">
+          {hhmm(state.at)}時点の写しです。<br />
+          読む許可が切れているので、その後の変更は入っていません。
+        </p>
       )}
 
       {state.kind === 'ok' && state.events.map((e, i) => {

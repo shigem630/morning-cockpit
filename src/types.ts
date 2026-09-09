@@ -6,6 +6,9 @@ export interface Task {
   important: boolean;
   dueDate?: YMD;
   createdAt: YMD;
+  /** 自分で並べたときの順番。小さいほど上。
+      触っていないものには入っていない（＝自動の順のまま）。 */
+  order?: number;
   doneAt?: YMD;
   deletedAt?: YMD;   // 削除は論理削除。deleteDoc は使わない
 }
