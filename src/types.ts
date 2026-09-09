@@ -6,7 +6,10 @@ export interface Task {
   important: boolean;
   dueDate?: YMD;
   createdAt: YMD;
-  /** 自分で並べたときの順番。小さいほど上。
+  /** 「先にやる」帯に入れているか。未設定は「そのほか」。
+      〆切から自動で決めない。どれを先にやるかは本人が決めることにする。 */
+  first?: boolean;
+  /** 自分で並べたときの順番。小さいほど上。帯の中でだけ効く。
       触っていないものには入っていない（＝自動の順のまま）。 */
   order?: number;
   doneAt?: YMD;

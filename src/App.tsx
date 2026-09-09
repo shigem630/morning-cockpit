@@ -282,15 +282,9 @@ function Cockpit({ user }: { user: User }) {
   /* ───── やることの並び替え ───── */
   const manual = useMemo(() => isManualOrder(openTasks), [openTasks]);
 
-  // 見えている順そのままに番号を振り直す。差分だけ書くと、自動順から手動順へ
+  // 見えている順そのままに帯と番号を振り直す。差分だけ書くと、自動順から手動順へ
   // 移った最初の1回で、触っていないものの順番が決まらない。
-  const moveTask = (index: number, dir: -1 | 1) => {
-    const j = index + dir;
-    if (j < 0 || j >= openTasks.length) return;
-    const next = [...openTasks];
-    [next[index], next[j]] = [next[j], next[index]];
-    reorderTasks(next.map((t) => t.id));
-  };
+  const applyOrder = (items: { id: string; first: boolean }[]) => { reorderTasks(items); };
 
   const backToAuto = () => {
     const ids = tasks.filter((t) => typeof t.order === 'number').map((t) => t.id);
@@ -427,7 +421,7 @@ function Cockpit({ user }: { user: User }) {
             <SoonCard today={today} task={soon} />
             <TaskList
               today={today} tasks={openTasks} closed={closedTasks}
-              manual={manual} onMove={moveTask} onAuto={backToAuto}
+              manual={manual} onReorder={applyOrder} onAuto={backToAuto}
               onAdd={(title, important, dueDate) =>
                 addTask({
                   title, important, dueDate, createdAt: today, order: nextTopOrder(),

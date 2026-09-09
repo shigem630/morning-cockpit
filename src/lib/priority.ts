@@ -24,7 +24,11 @@ export function isManualOrder(tasks: Task[]): boolean {
 
 export function sortTasks(tasks: Task[], today: YMD): Task[] {
   return [...tasks].sort((a, b) => {
-    // 自分で並べたものが最優先。自動の理屈で勝手に追い越さない。
+    // まず帯。「先にやる」は本人が入れたものなので、自動の理屈で追い越さない。
+    const band = Number(!a.first) - Number(!b.first);
+    if (band !== 0) return band;
+
+    // 帯の中。自分で並べたものが先。
     const ao = a.order, bo = b.order;
     if (typeof ao === 'number' && typeof bo === 'number') return ao - bo;
     if (typeof ao === 'number') return -1;

@@ -167,7 +167,15 @@ button:hover { background: var(--surface-sub); }
   .sched.now { background:var(--surface-sub); border-radius:6px; padding:5px 8px; margin:0 -8px; }
 
   .empty { font-size:14px; color:var(--text-muted); padding:8px 0 4px; }
-  .empty a, .item.task .head { align-items:center; gap:14px; }
+  .empty a, .band { margin-top:6px; }
+.band.first { background:var(--surface-sub); border:1px solid var(--border); border-radius:var(--r-ctrl); padding:12px 16px 6px; margin-bottom:14px; }
+.bandname { display:flex; align-items:baseline; gap:10px; font-size:13px; font-weight:700; letter-spacing:.04em; color:var(--text); margin:0 0 8px; }
+.bandname .note { font-size:12px; font-weight:400; letter-spacing:0; color:var(--text-muted); }
+.drophint { font-size:12px; color:var(--text-muted); margin:6px 0 10px; }
+.grip { flex:none; color:var(--text-muted); opacity:.5; font-size:14px; line-height:1; cursor:grab; user-select:none; }
+.item.task { cursor:grab; }
+.item.over { box-shadow: inset 0 2px 0 var(--accent); }
+.item.task .head { align-items:center; gap:14px; }
 .item.task .left { display:flex; align-items:baseline; gap:12px; min-width:0; flex:1 1 auto; }
 .item.task .right { display:flex; align-items:center; gap:10px; flex:none; white-space:nowrap; }
 .rank { flex:none; width:20px; text-align:right; font-size:13px; font-variant-numeric:tabular-nums; color:var(--text-muted); }
@@ -341,15 +349,20 @@ button:hover { background: var(--surface-sub); }
         <p class="sec">やること<span class="note">全10件</span></p><button>追加</button>
       </div>
       <p class="legend">
-        上から順に。<b>↑↓</b>で入れ替えられます（今は重要・急ぎの順）　／　
+        行をつかんで動かせます（矢印でも動きます）。　
         <b>終わった</b>＝やり切った　<b>やらない</b>＝やらずに一覧から外す（どちらも下の記録から戻せます）
       </p>
-      <div class="item task"><div class="head"><span class="left"><span class="rank top">1</span><span class="tname title-1line">配慮申請書類の作成</span></span><span class="sub right"><b class="badge">重要</b><span class="due-far">〆9/20・あと15日</span><span class="rowacts"><button class="act mv" disabled>↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item task"><div class="head"><span class="left"><span class="rank top">2</span><span class="tname title-1line">満田かなんさんに電話</span></span><span class="sub right"><b class="badge">重要</b><span class="due-far">〆9/25・あと20日</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item task"><div class="head"><span class="left"><span class="rank top">3</span><span class="tname title-1line">私学教頭会内規案の作成</span></span><span class="sub right"><span class="due-far">〆10/31・あと56日</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item task"><div class="head"><span class="left"><span class="rank">4</span><span class="tname title-1line">向洋中学校 学校訪問の準備</span></span><span class="sub right"><span class="due-none">〆切なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item task"><div class="head"><span class="left"><span class="rank">5</span><span class="tname title-1line">10月中学校教員対象説明会：案内文作成</span></span><span class="sub right"><span class="due-none">〆切なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv" disabled>↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <p class="more">ほか5件 ・ <span class="linkish">すべて見る</span></p>
+      <div class="band first">
+      <p class="bandname">先にやる<span class="note">今日ここから手をつける</span></p>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank top">1</span><span class="tname title-1line">配慮申請書類の作成</span></span><span class="sub right"><b class="badge">重要</b><span class="due-over">〆9月9日・今日</span><span class="rowacts"><button class="act mv" disabled>↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank top">2</span><span class="tname title-1line">満田かなんさんに電話</span></span><span class="sub right"><b class="badge">重要</b><span class="due-soon">〆9月14日・あと5日</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv" disabled>↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      </div>
+      <div class="band">
+      <p class="bandname">そのほか<span class="note">重要・急ぎの順</span></p>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank">1</span><span class="tname title-1line">私学教頭会内規案の作成</span></span><span class="sub right"><span class="due-far">〆10月31日・あと52日</span><span class="rowacts"><button class="act mv" disabled>↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank">2</span><span class="tname title-1line">向洋中学校 学校訪問の準備</span></span><span class="sub right"><span class="due-none">〆切なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank">3</span><span class="tname title-1line">10月中学校教員対象説明会：案内文作成</span></span><span class="sub right"><span class="due-none">〆切なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv" disabled>↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <p class="more">ほか5件 ・ <span class="linkish">すべて見る</span></p></div>
     </div>
 
   </div>

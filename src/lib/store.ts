@@ -178,18 +178,26 @@ export async function updateTask(id: string, patch: Partial<Task>) {
   await updateDoc(doc(tasksCol(), id), patch);
 }
 
-/** 並べ替え。見えている順そのままに 1,2,3… を振り直して、まとめて1回で書く。
+/** 並べ替え。見えている順そのままに帯と 1,2,3… を振り直して、まとめて1回で書く。
     1件ずつ書くと、途中で失敗したときに順番が混ざったまま残る。 */
-export async function reorderTasks(idsInOrder: string[]) {
+export async function reorderTasks(items: { id: string; first: boolean }[]) {
   const b = writeBatch(db);
-  idsInOrder.forEach((id, i) => b.update(doc(tasksCol(), id), { order: i + 1 }));
+  items.forEach(({ id, first }, i) =>
+    b.update(doc(tasksCol(), id), { order: i + 1, first }));
   await b.commit();
 }
 
-/** 自動の順に戻す。order を消すだけで、仕事そのものには触らない。 */
+/** 自動の順に戻す。order だけを消す。帯（先にやる）は本人の判断なので残す。 */
 export async function clearTaskOrder(ids: string[]) {
   const b = writeBatch(db);
   ids.forEach((id) => b.update(doc(tasksCol(), id), { order: deleteField() }));
+  await b.commit();
+}
+
+/** 「先にやる」帯を空にする。順番には触らない。 */
+export async function clearTaskBand(ids: string[]) {
+  const b = writeBatch(db);
+  ids.forEach((id) => b.update(doc(tasksCol(), id), { first: deleteField() }));
   await b.commit();
 }
 
