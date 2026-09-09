@@ -207,6 +207,12 @@ export async function addStalled(s: Omit<Stalled, 'id'>) {
   return id;
 }
 
+/** 返事待ちの期限。あとから入れられるようにする（エステル経由で足したものには入っていない）。 */
+export async function setStalledDue(id: string, dueDate: YMD | null) {
+  await updateDoc(doc(stalledCol(), id),
+    dueDate ? { dueDate } : { dueDate: deleteField() });
+}
+
 /** 声をかけた。arrayUnion なので同じ日に何度押しても1件にしかならない。 */
 export async function nudge(id: string, today: YMD) {
   await updateDoc(doc(stalledCol(), id), { nudges: arrayUnion(today) });

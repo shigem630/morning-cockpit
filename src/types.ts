@@ -21,6 +21,8 @@ export interface Stalled {
   what: string;
   who: string;
   requestedAt: YMD;
+  /** いつまでに返してほしいか。無くてもよい（その場合は放置日数で見る）。 */
+  dueDate?: YMD;
   nudges: YMD[];      // 日付の配列。arrayUnion で日単位に冪等（連打で増えない）
   resolvedAt?: YMD;
   outcome?: 'done' | 'selfDid' | 'dropped';

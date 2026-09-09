@@ -147,6 +147,26 @@ button[aria-pressed="true"].primary { background:var(--accent); color:#fff; }
 
 .exits { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
 
+/* ───── 返事待ち。1件3行を2行にして場所を詰める ───── */
+.item.stall { padding: 10px 0; }
+.item.stall .head { align-items: baseline; }
+.item.stall .meta {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px;
+  font-size: 13px; line-height: 1.6; margin: 2px 0 0;
+}
+.item.stall .exits-inline {
+  display: inline-flex; align-items: baseline; gap: 6px; margin-left: auto;
+}
+/* 〆切の日付は押せる。色は状態の色のまま（赤い日付が急に accent 色になると意味が壊れる） */
+.editdue {
+  background: none; border: 0; padding: 0; font: inherit; color: inherit;
+  text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer;
+}
+.field {
+  display: flex; flex-direction: column; gap: 3px;
+  font-size: 12px; color: var(--text-muted);
+}
+
 /* ───── ログイン画面 ───── */
 .gate { max-width:420px; margin:14vh auto; text-align:center; }
 .gate h1 { font-size:22px; margin-bottom:10px; }

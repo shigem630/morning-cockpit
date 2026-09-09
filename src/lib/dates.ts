@@ -115,6 +115,17 @@ export function businessDaysBefore(ymd: YMD, n: number): YMD {
   return d;
 }
 
+/** ymd から n 営業日後 */
+export function businessDaysAfter(ymd: YMD, n: number): YMD {
+  let d = ymd;
+  let left = n;
+  while (left > 0) {
+    d = addDays(d, 1);
+    if (isBusinessDay(d)) left--;
+  }
+  return d;
+}
+
 /** その週（月曜始まり）の最初の営業日 */
 export function firstBusinessDayOfWeek(ymd: YMD): YMD {
   const wd = weekdayIndex(ymd);

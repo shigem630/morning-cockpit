@@ -8,8 +8,8 @@ import { eligibleRoutines, last30Days } from './lib/eligible';
 import { isManualOrder, isOpen, sortTasks } from './lib/priority';
 import {
   addStalled, addTask, clearFocus, clearTaskOrder, nudge, reopenStalled, reorderTasks,
-  resolveStalled, restoreTask, setFocus, setWorked, toggleCheck, unnudge, updateTask,
-  useDayLog, useRecentLogs, useStalled, useTasks, useYesterdayLog,
+  resolveStalled, restoreTask, setFocus, setStalledDue, setWorked, toggleCheck, unnudge,
+  updateTask, useDayLog, useRecentLogs, useStalled, useTasks, useYesterdayLog,
 } from './lib/store';
 import {
   CalendarApiError, fetchTodayEvents, NoTokenError, readCalendarCache, saveCalendarCache,
@@ -401,8 +401,9 @@ function Cockpit({ user }: { user: User }) {
             onUnnudge={(id) => unnudge(id, today)}
             onReopen={(id) => reopenStalled(id)}
             onResolve={(id, outcome: Stalled['outcome']) => resolveStalled(id, today, outcome)}
-            onAdd={(who, what) =>
-              addStalled({ who, what, requestedAt: today, nudges: [] })}
+            onDue={(id, dueDate) => setStalledDue(id, dueDate)}
+            onAdd={(who, what, dueDate) =>
+              addStalled({ who, what, dueDate, requestedAt: today, nudges: [] })}
           />
           <RoutineChecks
             eligible={eligible} log={log}

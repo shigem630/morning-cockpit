@@ -167,7 +167,12 @@ button:hover { background: var(--surface-sub); }
   .sched.now { background:var(--surface-sub); border-radius:6px; padding:5px 8px; margin:0 -8px; }
 
   .empty { font-size:14px; color:var(--text-muted); padding:8px 0 4px; }
-  .empty a, .band { margin-top:6px; }
+  .empty a, .item.stall { padding:10px 0; }
+.item.stall .head { align-items:baseline; }
+.item.stall .meta { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 10px; font-size:13px; line-height:1.6; margin:2px 0 0; }
+.item.stall .exits-inline { display:inline-flex; align-items:baseline; gap:6px; margin-left:auto; }
+.editdue { background:none; border:0; padding:0; font:inherit; color:inherit; text-decoration:underline dotted; text-underline-offset:2px; cursor:pointer; }
+.band { margin-top:6px; }
 .band.first { background:var(--surface-sub); border:1px solid var(--border); border-radius:var(--r-ctrl); padding:12px 16px 6px; margin-bottom:14px; }
 .bandname { display:flex; align-items:baseline; gap:10px; font-size:13px; font-weight:700; letter-spacing:.04em; color:var(--text); margin:0 0 8px; }
 .bandname .note { font-size:12px; font-weight:400; letter-spacing:0; color:var(--text-muted); }
@@ -286,20 +291,8 @@ button:hover { background: var(--surface-sub); }
     <!-- 返事待ち -->
     <div class="card">
       <p class="sec">返事待ち<span class="note">人に頼んで、返ってきていない仕事</span></p>
-      <div id="stalled-list">
-        <div class="item">
-          <div class="head"><span>内規案の確認</span><button>声をかけた</button></div>
-          <p class="meta"><span class="nm">田中先生</span>・<span class="d7">12日目</span>・9/1、9/3に連絡</p>
-        </div>
-        <div class="item">
-          <div class="head"><span>名簿の提出</span><button>声をかけた</button></div>
-          <p class="meta"><span class="nm">佐藤先生</span>・<span class="d3">6日目</span></p>
-        </div>
-        <div class="item">
-          <div class="head"><span>資料の返却</span><button>声をかけた</button></div>
-          <p class="meta"><span class="nm">鈴木先生</span>・<span class="d0">2日目</span></p>
-        </div>
-        <p class="more">ほか2件 ・ <span class="linkish">すべて見る</span></p>
+      <div class="item stall"><div class="head"><span class="title-1line">内規案の確認</span><button>声をかけた</button></div><p class="meta"><span>鈴木先生・<span class="d7">〆<span class="editdue">9/7</span>を2日過ぎています</span></span><span class="exits-inline"><span class="linkish">返事が来た</span><span class="sub">／</span><span class="linkish">取り下げる</span></span></p></div><div class="item stall"><div class="head"><span class="title-1line">次年度授業担当一覧</span><button>声をかけた</button></div><p class="meta"><span>田中先生・<span class="due-soon">今日、声をかける（〆<span class="editdue">9/14</span>・あと5日）</span></span><span class="exits-inline"><span class="linkish">返事が来た</span><span class="sub">／</span><span class="linkish">取り下げる</span></span></p></div><div class="item stall"><div class="head"><span class="title-1line">部活動計画の提出</span><button>声をかけた</button></div><p class="meta"><span>佐藤先生・<span class="due-far">あと6日で声をかける（〆<span class="editdue">9/18</span>）</span></span><span class="exits-inline"><span class="linkish">返事が来た</span><span class="sub">／</span><span class="linkish">取り下げる</span></span></p></div>
+      <p class="more">ほか2件 ・ <span class="linkish">すべて見る</span></p>
       </div>
       <p class="empty hide" id="stalled-empty">まだありません。誰かに仕事を頼んだら、Discordのエステルに一言送ってください。</p>
     </div>
