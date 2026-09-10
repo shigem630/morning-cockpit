@@ -236,7 +236,7 @@ button:hover { background: var(--surface-sub); }
   <div class="top">
     <div class="date">9月5日（金）</div>
     <div class="right">
-      <button id="mask">伏せる</button>
+      <button id="mask">非表示</button>
       <span class="seg">
         <button data-t="auto" aria-pressed="true">自動</button>
         <button data-t="light" aria-pressed="false">明</button>
@@ -256,14 +256,14 @@ button:hover { background: var(--surface-sub); }
   <!-- 今日の一点 -->
   <div class="card focus" id="focus-normal">
     <div>
-      <p class="sec">今日の最優先</p>
+      <p class="sec">本日の最優先</p>
       <h2>避難訓練の準備</h2>
-      <p class="due">〆9月1日・4日超過</p>
+      <p class="due">期限 9月1日・4日超過</p>
     </div>
     <div style="text-align:right">
       <div class="acts">
-        <button class="primary">終わった</button>
-        <button>手はつけた</button>
+        <button class="primary">完了</button>
+        <button>着手</button>
         <span class="when">
           <button aria-pressed="true">午前</button>
           <button aria-pressed="false">昼</button>
@@ -271,7 +271,7 @@ button:hover { background: var(--surface-sub); }
         </span>
       </div>
       <p class="sub" style="margin:10px 0 0">
-        <span class="linkish">別のにする</span>
+        <span class="linkish">候補を変更</span>
         <span style="margin-left:14px">直近30日で18日</span>
       </p>
     </div>
@@ -279,27 +279,26 @@ button:hover { background: var(--surface-sub); }
 
   <div class="card focus hide" id="focus-empty">
     <div>
-      <p class="sec">今日の最優先</p>
-      <h2 style="color:var(--text-muted);font-size:20px">まず1つだけ書いてみましょう</h2>
+      <p class="sec">本日の最優先</p>
+      <h2 style="color:var(--text-muted);font-size:20px">まず1件、登録してください</h2>
       <input placeholder="例：避難訓練の準備" style="font:inherit;font-size:16px;margin-top:10px;padding:8px 12px;width:340px;border:1px solid var(--border);border-radius:var(--r-ctrl);background:var(--surface);color:var(--text)">
     </div>
-    <div><button class="primary">これにする</button></div>
+    <div><button class="primary">登録</button></div>
   </div>
 
   <div class="cols">
 
-    <!-- 返事待ち -->
+    <!-- 回答待ち -->
     <div class="card">
-      <p class="sec">返事待ち<span class="note">人に頼んで、返ってきていない仕事</span></p>
-      <div class="item stall"><div class="head"><span class="title-1line">内規案の確認</span><button>声をかけた</button></div><p class="meta"><span>鈴木先生・<span class="d7">〆<span class="editdue">9/7</span>を2日過ぎています</span></span><span class="exits-inline"><span class="linkish">返事が来た</span><span class="sub">／</span><span class="linkish">取り下げる</span></span></p></div><div class="item stall"><div class="head"><span class="title-1line">次年度授業担当一覧</span><button>声をかけた</button></div><p class="meta"><span>田中先生・<span class="due-soon">今日、声をかける（〆<span class="editdue">9/14</span>・あと5日）</span></span><span class="exits-inline"><span class="linkish">返事が来た</span><span class="sub">／</span><span class="linkish">取り下げる</span></span></p></div><div class="item stall"><div class="head"><span class="title-1line">部活動計画の提出</span><button>声をかけた</button></div><p class="meta"><span>佐藤先生・<span class="due-far">あと6日で声をかける（〆<span class="editdue">9/18</span>）</span></span><span class="exits-inline"><span class="linkish">返事が来た</span><span class="sub">／</span><span class="linkish">取り下げる</span></span></p></div>
-      <p class="more">ほか2件 ・ <span class="linkish">すべて見る</span></p>
-      </div>
-      <p class="empty hide" id="stalled-empty">まだありません。誰かに仕事を頼んだら、Discordのエステルに一言送ってください。</p>
+      <p class="sec">回答待ち<span class="note">依頼したまま回答が届いていない案件</span></p>
+      <div class="item stall"><div class="head"><span class="title-1line">内規案の確認</span><button>催促</button></div><p class="meta"><span>鈴木先生・<span class="d7">期限 <span class="editdue">9/7</span>・2日超過</span></span><span class="exits-inline"><span class="linkish">回答あり</span><span class="sub">／</span><span class="linkish">取り下げ</span></span></p></div><div class="item stall"><div class="head"><span class="title-1line">次年度授業担当一覧</span><button>催促</button></div><p class="meta"><span>田中先生・<span class="due-soon">本日、催促（期限 <span class="editdue">9/14</span>・残り5日）</span></span><span class="exits-inline"><span class="linkish">回答あり</span><span class="sub">／</span><span class="linkish">取り下げ</span></span></p></div><div class="item stall"><div class="head"><span class="title-1line">部活動計画の提出</span><button>催促</button></div><p class="meta"><span>佐藤先生・<span class="due-far">催促まで残り6日（期限 <span class="editdue">9/18</span>）</span></span><span class="exits-inline"><span class="linkish">回答あり</span><span class="sub">／</span><span class="linkish">取り下げ</span></span></p></div>
+      <p class="more">他2件 ・ <span class="linkish">すべて表示</span></p>
+      <p class="empty hide" id="stalled-empty">登録はありません。依頼した際は、Discordのエステルにご連絡ください。</p>
     </div>
 
     <!-- 今日のチェック -->
     <div class="card">
-      <p class="sec">今日のルーティン<span class="note">毎日・毎週・毎月やること</span></p>
+      <p class="sec">本日の定例業務<span class="note">毎日・毎週・毎月の定例業務</span></p>
       <label class="chk on"><input type="checkbox" checked><span>メールの確認</span></label>
       <label class="chk"><input type="checkbox"><span>メールの返信</span></label>
       <label class="chk"><input type="checkbox"><span>ジョブカンの承認</span></label>
@@ -309,12 +308,12 @@ button:hover { background: var(--surface-sub); }
       <label class="chk"><input type="checkbox"><span>申込データの更新</span></label>
       <p class="divider">今月</p>
       <label class="chk"><input type="checkbox"><span>勤怠の中間確認</span></label>
-      <div style="text-align:right;margin-top:14px"><button>今日は休み</button></div>
+      <div style="text-align:right;margin-top:14px"><button>本日は休務</button></div>
     </div>
 
-    <!-- 今日の予定 -->
+    <!-- 本日の予定 -->
     <div class="card">
-      <p class="sec">今日の予定</p>
+      <p class="sec">本日の予定</p>
       <div id="cal-ok">
         <div class="sched now"><span class="t">09:00</span><span>職員朝礼</span></div>
         <div class="sched"><span class="t">13:30</span><span>教頭会</span></div>
@@ -330,32 +329,32 @@ button:hover { background: var(--surface-sub); }
   <div class="stack">
 
     <div class="card" id="soon">
-      <p class="sec">重要・急ぎでない<span class="note">〆切がないぶん、後回しになりやすい仕事</span></p>
+      <p class="sec">重要・緊急でない<span class="note">期限がないため、後回しになりやすい案件</span></p>
       <div class="head" style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
         <span>2027年度パンフレット叩き台</span>
-        <span class="sub">重要・〆切なし・<span class="d7">38日目</span></span>
+        <span class="sub">重要・期限なし・<span class="d7">38日目</span></span>
       </div>
     </div>
 
     <div class="card" id="tasks">
       <div style="display:flex;justify-content:space-between;align-items:baseline">
-        <p class="sec">やること<span class="note">全10件</span></p><button>追加</button>
+        <p class="sec">タスク<span class="note">全10件</span></p><button>追加</button>
       </div>
       <p class="legend">
-        行をつかんで動かせます（矢印でも動きます）。　
-        <b>終わった</b>＝やり切った　<b>やらない</b>＝やらずに一覧から外す（どちらも下の記録から戻せます）
+        行をドラッグして並べ替えられます（矢印でも移動できます）。　
+        <b>完了</b>＝実施済み　<b>取りやめ</b>＝実施せず一覧から除外（いずれも下の履歴から復元できます）
       </p>
       <div class="band first">
-      <p class="bandname">先にやる<span class="note">今日ここから手をつける</span></p>
-      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank top">1</span><span class="tname title-1line">配慮申請書類の作成</span></span><span class="sub right"><b class="badge">重要</b><span class="due-over">〆9月9日・今日</span><span class="rowacts"><button class="act mv" disabled>↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank top">2</span><span class="tname title-1line">満田かなんさんに電話</span></span><span class="sub right"><b class="badge">重要</b><span class="due-soon">〆9月14日・あと5日</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv" disabled>↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
+      <p class="bandname">優先<span class="note">本日、優先して着手するもの</span></p>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank top">1</span><span class="tname title-1line">配慮申請書類の作成</span></span><span class="sub right"><b class="badge">重要</b><span class="due-over">期限 9月9日・本日</span><span class="rowacts"><button class="act mv" disabled>↑</button><button class="act mv">↓</button><button class="act ok">完了</button><button class="act">取りやめ</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank top">2</span><span class="tname title-1line">満田かなんさんに電話</span></span><span class="sub right"><b class="badge">重要</b><span class="due-soon">期限 9月14日・残り5日</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv" disabled>↓</button><button class="act ok">完了</button><button class="act">取りやめ</button></span></span></div></div>
       </div>
       <div class="band">
-      <p class="bandname">そのほか<span class="note">重要・急ぎの順</span></p>
-      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank">1</span><span class="tname title-1line">私学教頭会内規案の作成</span></span><span class="sub right"><span class="due-far">〆10月31日・あと52日</span><span class="rowacts"><button class="act mv" disabled>↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank">2</span><span class="tname title-1line">向洋中学校 学校訪問の準備</span></span><span class="sub right"><span class="due-none">〆切なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv">↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank">3</span><span class="tname title-1line">10月中学校教員対象説明会：案内文作成</span></span><span class="sub right"><span class="due-none">〆切なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv" disabled>↓</button><button class="act ok">終わった</button><button class="act">やらない</button></span></span></div></div>
-      <p class="more">ほか5件 ・ <span class="linkish">すべて見る</span></p></div>
+      <p class="bandname">その他<span class="note">重要度・期限順</span></p>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank">1</span><span class="tname title-1line">私学教頭会内規案の作成</span></span><span class="sub right"><span class="due-far">期限 10月31日・残り52日</span><span class="rowacts"><button class="act mv" disabled>↑</button><button class="act mv">↓</button><button class="act ok">完了</button><button class="act">取りやめ</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank">2</span><span class="tname title-1line">向洋中学校 学校訪問の準備</span></span><span class="sub right"><span class="due-none">期限なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv">↓</button><button class="act ok">完了</button><button class="act">取りやめ</button></span></span></div></div>
+      <div class="item task"><div class="head"><span class="left"><span class="grip">⠿</span><span class="rank">3</span><span class="tname title-1line">10月中学校教員対象説明会：案内文作成</span></span><span class="sub right"><span class="due-none">期限なし</span><span class="rowacts"><button class="act mv">↑</button><button class="act mv" disabled>↓</button><button class="act ok">完了</button><button class="act">取りやめ</button></span></span></div></div>
+      <p class="more">他5件 ・ <span class="linkish">すべて表示</span></p></div>
     </div>
 
   </div>

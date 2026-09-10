@@ -48,8 +48,8 @@ export function dueLabel(t: Task, today: YMD): { text: string; over: boolean } |
   if (!t.dueDate) return null;
   const n = daysBetween(today, t.dueDate);
   const [, m, d] = t.dueDate.split('-').map(Number);
-  const base = `〆${m}月${d}日`;
+  const base = `期限 ${m}月${d}日`;
   if (n < 0) return { text: `${base}・${-n}日超過`, over: true };
-  if (n === 0) return { text: `${base}・今日`, over: true };
-  return { text: `${base}・あと${n}日`, over: false };
+  if (n === 0) return { text: `${base}・本日`, over: true };
+  return { text: `${base}・残り${n}日`, over: false };
 }

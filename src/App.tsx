@@ -53,7 +53,7 @@ export default function App() {
             <p style={{ color: 'var(--alert)', margin: 0 }}>ログインできませんでした</p>
             <p className="sub" style={{ marginTop: 8 }}>
               <code>{authError}</code><br />
-              この画面をそのまま撮って送ってください。
+              この画面を撮影してお送りください。
             </p>
           </div>
         )}
@@ -273,7 +273,7 @@ function Cockpit({ user }: { user: User }) {
       downloadJson(data, `morning-cockpit-${today}.json`);
     } catch (e) {
       const r = e as { code?: string; message?: string };
-      setCrash(`書き出しに失敗しました： ${r.code ?? ''} ${r.message ?? String(e)}`);
+      setCrash(`バックアップの出力に失敗しました： ${r.code ?? ''} ${r.message ?? String(e)}`);
     } finally {
       setExporting(false);
     }
@@ -326,8 +326,8 @@ function Cockpit({ user }: { user: User }) {
   return (
     <>
       <div className="toonarrow">
-        <strong>この画面はパソコン用です。</strong><br />
-        スマホからは、Discordのエステルに聞いてください。
+        <strong>この画面はパソコン向けです。</strong><br />
+        スマートフォンからは、Discordのエステルをご利用ください。
       </div>
 
       <div className="wrap desktop-only">
@@ -344,7 +344,7 @@ function Cockpit({ user }: { user: User }) {
         {crash && (
           <div className="banner">
             <div>
-              うまくいかなかった操作があります。<br />
+              実行できなかった操作があります。<br />
               <code>{crash}</code>
             </div>
             <button onClick={() => setCrash(null)}>閉じる</button>
@@ -355,19 +355,19 @@ function Cockpit({ user }: { user: User }) {
 
         {help && (
           <div className="card" style={{ marginBottom: 14 }}>
-            <SectionTitle>キー操作</SectionTitle>
+            <SectionTitle>キーボード操作</SectionTitle>
             <p className="sub" style={{ margin: 0 }}>
-              1〜5：ルーティンワークを入れる／外す　　Enter：今日の最優先を「終わった」にする　　? ：この一覧
+              1〜5：定例業務のチェックを切り替え　　Enter：本日の最優先を「完了」にする　　?：この一覧を表示
             </p>
           </div>
         )}
 
         {missingSeeds.length > 0 && (
           <div className="card" style={{ marginBottom: 14 }}>
-            <SectionTitle>はじめに</SectionTitle>
+            <SectionTitle>初期設定</SectionTitle>
             <p style={{ margin: '0 0 12px' }}>
-              やることリストの{missingSeeds.length}件が、まだ入っていません。
-              <span className="sub">（元のファイルは消しません。すでに入っているものは飛ばします）</span>
+              やることリストの{missingSeeds.length}件が未登録です。
+              <span className="sub">（元のファイルは削除しません。登録済みのものは除外します）</span>
             </p>
             <button className="primary" disabled={importing} onClick={importSeed}>
               {importing ? '取り込んでいます…' : `${missingSeeds.length}件を取り込む`}

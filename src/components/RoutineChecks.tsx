@@ -21,14 +21,14 @@ export default function RoutineChecks(p: Props) {
   if (!p.working) {
     return (
       <div className="card">
-        <SectionTitle note="毎日・毎週・毎月やること">今日のルーティン</SectionTitle>
+        <SectionTitle note="毎日・毎週・毎月の定例業務">本日の定例業務</SectionTitle>
         <p className="empty">
           {p.calendarSaysWork
-            ? '今日は休みとして記録しました。'
-            : '今日は勤務日ではありません。チェックはお休みです。'}
+            ? '本日は休務として記録しました。'
+            : '本日は勤務日ではありません。'}
         </p>
         <div style={{ textAlign: 'right', marginTop: 8 }}>
-          <button onClick={() => p.onSetWorking(true)}>今日は出勤</button>
+          <button onClick={() => p.onSetWorking(true)}>本日は勤務</button>
         </div>
       </div>
     );
@@ -51,8 +51,8 @@ export default function RoutineChecks(p: Props) {
   return (
     <div className="card">
       <div className="rowbar">
-        <SectionTitle note="毎日・毎週・毎月やること">今日のルーティン</SectionTitle>
-        <button onClick={() => p.onSetWorking(false)}>今日は休み</button>
+        <SectionTitle note="毎日・毎週・毎月の定例業務">本日の定例業務</SectionTitle>
+        <button onClick={() => p.onSetWorking(false)}>本日は休務</button>
       </div>
       {daily.map((r, i) => row(r, i + 1))}
       {weekly.length > 0 && <p className="divider">今週</p>}

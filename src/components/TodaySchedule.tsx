@@ -37,22 +37,22 @@ export default function TodaySchedule({ state, nowHHMM, when, onLoad }: Props) {
   return (
     <div className="card">
       <div className="rowbar">
-        <SectionTitle>今日の予定</SectionTitle>
+        <SectionTitle>本日の予定</SectionTitle>
         {state.kind !== 'loading' && (
-          <button onClick={onLoad}>{state.kind === 'ok' ? '読み直す' : '予定を読む'}</button>
+          <button onClick={onLoad}>{state.kind === 'ok' ? '再取得' : '予定を取得'}</button>
         )}
       </div>
 
       {state.kind === 'idle' && (
-        <p className="empty">「予定を読む」を押すと、今日の予定を取り出します。</p>
+        <p className="empty">「予定を取得」を押すと、本日の予定を表示します。</p>
       )}
 
-      {state.kind === 'loading' && <p className="empty">読んでいます…</p>}
+      {state.kind === 'loading' && <p className="empty">取得しています…</p>}
 
       {state.kind === 'notoken' && (
         <p className="empty">
-          カレンダーを読む許可が切れました（約1時間で切れます）。<br />
-          もう一度「予定を読む」を押すと、入り直せます。
+          カレンダーへのアクセス許可が失効しました（約1時間で失効します）。<br />
+          「予定を取得」を押すと、再度認証できます。
         </p>
       )}
 
@@ -65,13 +65,13 @@ export default function TodaySchedule({ state, nowHHMM, when, onLoad }: Props) {
       )}
 
       {state.kind === 'ok' && state.events.length === 0 && (
-        <p className="empty">今日の予定はありません（{hhmm(state.at)}時点）。</p>
+        <p className="empty">本日の予定はありません（{hhmm(state.at)}時点）。</p>
       )}
 
       {state.kind === 'ok' && !state.live && (
         <p className="stale">
-          {hhmm(state.at)}時点の写しです。<br />
-          読む許可が切れているので、その後の変更は入っていません。
+          {hhmm(state.at)}時点の取得内容です。<br />
+          アクセス許可が失効しているため、以降の変更は反映されていません。
         </p>
       )}
 

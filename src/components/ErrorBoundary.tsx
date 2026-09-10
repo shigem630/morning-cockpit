@@ -23,28 +23,28 @@ export default class ErrorBoundary extends Component<{ children: ReactNode }, St
     return (
       <div className="wrap" style={{ paddingTop: 32 }}>
         <div className="banner" style={{ display: 'block' }}>
-          <p style={{ margin: '0 0 8px', fontWeight: 500 }}>画面が落ちました。</p>
+          <p style={{ margin: '0 0 8px', fontWeight: 500 }}>画面の表示に失敗しました。</p>
           <p className="sub" style={{ margin: 0, color: 'inherit' }}>
-            下の文をそのままコピーして送ってください。保存済みのデータは無事です。
+            下記の内容をコピーしてお送りください。保存済みのデータに影響はありません。
           </p>
         </div>
         <div className="card">
-          <p className="sec">エラー</p>
+          <p className="sec">エラー内容</p>
           <pre style={{
             whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: 0,
             fontSize: 13, lineHeight: 1.7,
           }}>
 {error.name}: {error.message}
 {'\n'}{error.stack ?? ''}
-{stack ? `\n--- どの部品か ---${stack}` : ''}
+{stack ? `\n--- 発生箇所 ---${stack}` : ''}
           </pre>
           <div style={{ marginTop: 16, display: 'flex', gap: 10 }}>
-            <button className="primary" onClick={() => location.reload()}>読み直す</button>
+            <button className="primary" onClick={() => location.reload()}>再読み込み</button>
             <button onClick={() => {
               navigator.clipboard.writeText(
                 `${error.name}: ${error.message}\n${error.stack ?? ''}\n${stack}`,
-              ).then(() => alert('コピーしました'), () => alert('上の文を選んでコピーしてください'));
-            }}>エラーをコピー</button>
+              ).then(() => alert('コピーしました'), () => alert('上記を選択してコピーしてください'));
+            }}>エラー内容をコピー</button>
           </div>
         </div>
       </div>

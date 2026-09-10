@@ -117,11 +117,11 @@ export default function TaskList(p: Props) {
               <input type="checkbox" checked={eImp} onChange={(e) => setEImp(e.target.checked)} />
               <span>重要</span>
             </label>
-            <button className="primary" disabled={!eTitle.trim()} onClick={saveEdit}>直す</button>
-            <button onClick={() => setEditing(null)}>やめる</button>
+            <button className="primary" disabled={!eTitle.trim()} onClick={saveEdit}>保存</button>
+            <button onClick={() => setEditing(null)}>キャンセル</button>
           </div>
           <p className="legend" style={{ margin: '8px 0 0' }}>
-            〆切を空にすると「〆切なし」になります。
+            期限を空欄にすると「期限なし」になります。
           </p>
         </div>
       );
@@ -145,25 +145,25 @@ export default function TaskList(p: Props) {
           <span className="left">
             <span className="grip" aria-hidden="true">⠿</span>
             <span className={`rank${band === 'first' ? ' top' : ''}`}>{i + 1}</span>
-            <button className="tname title-1line editable" title="押すと直せます"
+            <button className="tname title-1line editable" title="クリックすると編集できます"
               onClick={() => startEdit(t)}>{t.title}</button>
           </span>
           <span className="sub right">
             {t.important && <b className="badge">重要</b>}
-            <span className={dueClass(t, p.today)}>{d ? d.text : '〆切なし'}</span>
+            <span className={dueClass(t, p.today)}>{d ? d.text : '期限なし'}</span>
             <span className="rowacts">
               <button className="act mv" disabled={i === 0}
-                aria-label="上へ動かす" title="上へ動かす"
+                aria-label="上へ移動" title="上へ移動"
                 onClick={() => move(band, i, -1)}>↑</button>
               <button className="act mv" disabled={i === lastIndex}
-                aria-label="下へ動かす" title="下へ動かす"
+                aria-label="下へ移動" title="下へ移動"
                 onClick={() => move(band, i, 1)}>↓</button>
               <button className="act" onClick={() => startEdit(t)}
-                title="題名・〆切・重要を直します。">直す</button>
+                title="件名・期限・重要度を編集します">編集</button>
               <button className="act ok" onClick={() => p.onDone(t.id)}
-                title="やり切ったものとして一覧から外します。あとで戻せます。">終わった</button>
+                title="実施済みとして一覧から外します。あとで復元できます。">完了</button>
               <button className="act" onClick={() => p.onDelete(t.id)}
-                title="やらないことにして一覧から外します。あとで戻せます。">やらない</button>
+                title="実施せずに一覧から外します。あとで復元できます。">取りやめ</button>
             </span>
           </span>
         </div>
@@ -187,26 +187,26 @@ export default function TaskList(p: Props) {
   return (
     <div className="card">
       <div className="rowbar">
-        <SectionTitle note={`全${p.tasks.length}件`}>やること</SectionTitle>
+        <SectionTitle note={`全${p.tasks.length}件`}>タスク</SectionTitle>
         <span style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           {p.manual && (
-            <button className="linkish" onClick={p.onAuto}>並びを自動に戻す</button>
+            <button className="linkish" onClick={p.onAuto}>並び順を自動に戻す</button>
           )}
-          <button onClick={() => setAdding((v) => !v)}>{adding ? 'やめる' : '追加'}</button>
+          <button onClick={() => setAdding((v) => !v)}>{adding ? 'キャンセル' : '追加'}</button>
         </span>
       </div>
 
       {p.tasks.length > 0 && (
         <p className="legend">
-          行をつかんで動かせます（矢印でも動きます）。　
-          <b>終わった</b>＝やり切った　<b>やらない</b>＝やらずに一覧から外す
-          （どちらも下の記録から戻せます）
+          行をドラッグして並べ替えられます（矢印でも移動できます）。　
+          <b>完了</b>＝実施済み　<b>取りやめ</b>＝実施せず一覧から除外
+          （いずれも下の履歴から復元できます）
         </p>
       )}
 
       {adding && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
-          <input className="textin" placeholder="やること" value={title}
+          <input className="textin" placeholder="件名" value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') submit(); }} />
           <input className="textin" style={{ width: 160 }} type="date" value={due}
@@ -216,11 +216,11 @@ export default function TaskList(p: Props) {
               onChange={(e) => setImportant(e.target.checked)} />
             <span>重要</span>
           </label>
-          <button className="primary" onClick={submit}>足す</button>
+          <button className="primary" onClick={submit}>追加</button>
         </div>
       )}
 
-      {p.tasks.length === 0 && <p className="empty">やることはありません。</p>}
+      {p.tasks.length === 0 && <p className="empty">登録されているタスクはありません。</p>}
 
       {p.tasks.length > 0 && (
         <>
@@ -228,13 +228,13 @@ export default function TaskList(p: Props) {
             className={`band first${overBand === 'first' ? ' over' : ''}`}
             {...bandProps('first')}
           >
-            <p className="bandname">先にやる<span className="note">今日ここから手をつける</span></p>
+            <p className="bandname">優先<span className="note">本日、優先して着手するもの</span></p>
             {firstList.length === 0
-              ? <p className="drophint">ここへ引っぱると、先にやるものになります。</p>
+              ? <p className="drophint">ここへドラッグすると、優先に移動します。</p>
               : firstList.map((t, i) => row(t, i, 'first', firstList.length - 1))}
             {firstList.length > 5 && (
               <p className="drophint">
-                先にやるものが{firstList.length}件あります。数が増えると、順番の意味が薄くなります。
+                優先が{firstList.length}件あります。件数が増えると、順位付けの意味が薄れます。
               </p>
             )}
           </div>
@@ -243,16 +243,16 @@ export default function TaskList(p: Props) {
             className={`band${overBand === 'rest' ? ' over' : ''}`}
             {...bandProps('rest')}
           >
-            <p className="bandname">そのほか<span className="note">重要・急ぎの順</span></p>
+            <p className="bandname">その他<span className="note">重要度・期限順</span></p>
             {restList.length === 0
-              ? <p className="drophint">ここには何もありません。</p>
+              ? <p className="drophint">該当するタスクはありません。</p>
               : shownRest.map((t, i) => row(t, i, 'rest', restList.length - 1))}
 
             {(hidden > 0 || expanded) && restList.length > VISIBLE && (
               <p className="more">
-                {hidden > 0 && <>ほか{hidden}件 ・ </>}
+                {hidden > 0 && <>他{hidden}件 ・ </>}
                 <button className="linkish" onClick={() => setExpanded((v) => !v)}>
-                  {expanded ? '畳む' : 'すべて見る'}
+                  {expanded ? '折りたたむ' : 'すべて表示'}
                 </button>
               </p>
             )}
@@ -263,7 +263,7 @@ export default function TaskList(p: Props) {
       {p.closed.length > 0 && (
         <p className="more">
           <button className="linkish" onClick={() => setShowClosed((v) => !v)}>
-            終わった・やらないことにしたもの（{p.closed.length}件）
+            完了・取りやめ（{p.closed.length}件）
           </button>
         </p>
       )}
@@ -272,9 +272,9 @@ export default function TaskList(p: Props) {
           <div className="head">
             <span className="sub title-1line" title={t.title}>
               {t.title}
-              {t.doneAt ? '　終わった' : '　やらないことにした'}
+              {t.doneAt ? '　完了' : '　取りやめ'}
             </span>
-            <button className="linkish" onClick={() => p.onRestore(t.id)}>戻す</button>
+            <button className="linkish" onClick={() => p.onRestore(t.id)}>復元</button>
           </div>
         </div>
       ))}
@@ -288,11 +288,11 @@ export function SoonCard({ today, task }: { today: YMD; task: Task | null }) {
   const days = dayCount(task.createdAt, today);
   return (
     <div className="card">
-      <SectionTitle note="〆切がないぶん、後回しになりやすい仕事">重要・急ぎでない</SectionTitle>
+      <SectionTitle note="期限がないため、後回しになりやすい案件">重要・緊急でない</SectionTitle>
       <div className="rowbar">
         <span>{task.title}</span>
         <span className="sub">
-          重要・{task.dueDate ? dueLabel(task, today)?.text : '〆切なし'}・
+          重要・{task.dueDate ? dueLabel(task, today)?.text : '期限なし'}・
           <span className={days >= 7 ? 'd7' : days >= 3 ? 'd3' : 'd0'}>{days}日目</span>
         </span>
       </div>

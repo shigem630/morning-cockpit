@@ -66,11 +66,11 @@ export class CalendarApiError extends Error {
   get advice(): string | null {
     if (this.reason === 'accessNotConfigured' || /has not been used in project|is disabled/.test(this.detail)) {
       return 'このプロジェクトで Google カレンダーの機能がまだ有効になっていません。'
-           + 'Google Cloud の「APIとサービス」で Google Calendar API を有効にすると直ります。';
+           + 'Google Cloud の「APIとサービス」で Google Calendar API を有効にすると解決します。';
     }
     if (this.reason === 'insufficientPermissions' || this.status === 403) {
-      return 'カレンダーを読む許可が下りていません。一度「出る」で出てから入り直し、'
-           + '同意画面でカレンダーのチェックを入れてください。';
+      return 'カレンダーの参照許可が付与されていません。一度「ログアウト」してから再度ログインし、'
+           + '同意画面でカレンダーの項目にチェックを入れてください。';
     }
     return null;
   }

@@ -11,18 +11,18 @@ function describe(code: string): { text: string; hint: string } {
   switch (code) {
     case 'permission-denied':
       return {
-        text: 'クラウドに拒否されました。保存できていません。',
+        text: 'サーバーに拒否されました。保存されていません。',
         hint: 'ログインが切れたか、セキュリティルールが変わった可能性があります。',
       };
     case 'unavailable':
       return {
-        text: 'クラウドにつながりません。手元にだけ残っています。',
+        text: 'サーバーに接続できません。この端末にのみ保存されています。',
         hint: 'ネットワークが切れているか、通信が遮断されています。',
       };
     case 'unauthenticated':
-      return { text: 'ログインが切れています。', hint: '一度出て、入り直してください。' };
+      return { text: 'ログインが切れています。', hint: '一度ログアウトし、再度ログインしてください。' };
     default:
-      return { text: '保存でエラーが起きました。', hint: 'この画面をそのまま撮って送ってください。' };
+      return { text: '保存でエラーが起きました。', hint: 'この画面を撮影してお送りください。' };
   }
 }
 
@@ -42,11 +42,11 @@ export function SyncBanner({ syncs, onRetry }: { syncs: SyncState[]; onRetry: ()
       <div>
         {pending > 0 && <>未保存が{pending}件あります。</>}
         {lastServer
-          ? <>最後にクラウドへ保存できたのは {hhmm(lastServer)} です。</>
-          : <>まだ一度もクラウドに届いていません。</>}
+          ? <>最後にサーバーへ保存できたのは {hhmm(lastServer)} です。</>
+          : <>まだ一度もサーバーへ保存されていません。</>}
         {d && <><br />{d.text} {d.hint}<br /><code>{err}</code></>}
       </div>
-      <button onClick={onRetry}>もう一度ためす</button>
+      <button onClick={onRetry}>再読み込み</button>
     </div>
   );
 }
@@ -59,7 +59,7 @@ export function ClockSkewBanner({ skewMs }: { skewMs: number | null }) {
       <div>
         このパソコンの時計が、正しい時刻から約{Math.abs(min)}分
         {min > 0 ? '進んで' : '遅れて'}います。
-        「◯日目」の数え方が狂うので、時計を合わせてください。
+        経過日数の計算がずれるため、時刻を修正してください。
       </div>
     </div>
   );
@@ -74,10 +74,10 @@ export function HolidayTableBanner({ today }: { today: YMD }) {
     <div className="banner warn">
       <div>
         {expired
-          ? <>祝日の一覧が {HOLIDAY_TABLE_END} で切れています。
-              いまは祝日を平日として数えています。内閣府のCSVから作り直してください。</>
-          : <>祝日の一覧が {HOLIDAY_TABLE_END} までしかありません。
-              年内に内閣府のCSVから作り直してください。</>}
+          ? <>祝日データが {HOLIDAY_TABLE_END} までで終了しています。
+              現在、祝日を平日として計算しています。内閣府のCSVから再作成してください。</>
+          : <>祝日データは {HOLIDAY_TABLE_END} までです。
+              年内に内閣府のCSVから再作成してください。</>}
       </div>
     </div>
   );

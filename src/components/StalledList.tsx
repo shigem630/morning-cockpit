@@ -106,35 +106,35 @@ export default function StalledList(p: Props) {
   return (
     <div className="card">
       <div className="rowbar">
-        <SectionTitle note="人に頼んで、返ってきていない仕事">返事待ち</SectionTitle>
-        <button onClick={() => setAdding((v) => !v)}>{adding ? 'やめる' : '足す'}</button>
+        <SectionTitle note="依頼したまま回答が届いていない案件">回答待ち</SectionTitle>
+        <button onClick={() => setAdding((v) => !v)}>{adding ? 'キャンセル' : '追加'}</button>
       </div>
 
       {adding && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: 14 }}>
           <label className="field">
-            誰に
+            依頼先
             <input className="textin" style={{ width: 120 }} value={who}
               placeholder="田中先生" onChange={(e) => setWho(e.target.value)} />
           </label>
           <label className="field">
-            何を頼んだか
+            依頼内容
             <input className="textin" style={{ width: 180 }} value={what}
               placeholder="次年度授業担当一覧" onChange={(e) => setWhat(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') submit(); }} />
           </label>
           <label className="field">
-            いつまでに
+            期限
             <input className="textin" style={{ width: 150 }} type="date" value={newDue}
               onChange={(e) => setNewDue(e.target.value)} />
           </label>
-          <button className="primary" onClick={submit}>足す</button>
+          <button className="primary" onClick={submit}>追加</button>
         </div>
       )}
 
       {open.length === 0 && !adding && (
         <p className="empty">
-          まだありません。誰かに仕事を頼んだら、Discordのエステルに一言送ってください。
+          登録はありません。依頼した際は、Discordのエステルにご連絡ください。
         </p>
       )}
 
@@ -151,10 +151,10 @@ export default function StalledList(p: Props) {
               <span className="title-1line" title={r.what}>{r.what}</span>
               <button
                 aria-pressed={nudgedToday}
-                title={nudgedToday ? 'もう一度押すと、今日の記録を取り消します' : undefined}
+                title={nudgedToday ? 'もう一度クリックすると、本日の記録を取り消します' : undefined}
                 onClick={() => (nudgedToday ? p.onUnnudge(r.id) : p.onNudge(r.id))}
               >
-                {nudgedToday ? '今日 声をかけた' : '声をかけた'}
+                {nudgedToday ? '本日 催促済み' : '催促'}
               </button>
             </div>
 
@@ -163,11 +163,11 @@ export default function StalledList(p: Props) {
                 <input className="textin" style={{ width: 150 }} type="date" value={draft}
                   autoFocus onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') saveDue(r.id); }} />
-                <button className="act ok" onClick={() => saveDue(r.id)}>入れる</button>
-                <button className="linkish" onClick={() => setEditing(null)}>やめる</button>
+                <button className="act ok" onClick={() => saveDue(r.id)}>設定</button>
+                <button className="linkish" onClick={() => setEditing(null)}>キャンセル</button>
                 {r.dueDate && (
                   <button className="linkish" onClick={() => { p.onDue(r.id, null); setEditing(null); }}>
-                    期限を消す
+                    期限を削除
                   </button>
                 )}
               </p>
@@ -178,17 +178,17 @@ export default function StalledList(p: Props) {
                   {'・'}
                   {pl.kind === 'over' && (
                     <span className={red ? 'd7' : 'd3'}>
-                      〆{dueBtn(r)}を{pl.days}日過ぎています
+                      期限 {dueBtn(r)}・{pl.days}日超過
                     </span>
                   )}
                   {pl.kind === 'now' && (
                     <span className="due-soon">
-                      今日、声をかける（〆{dueBtn(r)}・{pl.left === 0 ? '今日' : `あと${pl.left}日`}）
+                      本日、催促（期限 {dueBtn(r)}・{pl.left === 0 ? '本日' : `残り${pl.left}日`}）
                     </span>
                   )}
                   {pl.kind === 'wait' && (
                     <span className="due-far">
-                      あと{pl.days}日で声をかける（〆{dueBtn(r)}）
+                      催促まで残り{pl.days}日（期限 {dueBtn(r)}）
                     </span>
                   )}
                   {pl.kind === 'age' && (
@@ -196,21 +196,21 @@ export default function StalledList(p: Props) {
                       <span className={red ? 'd7' : pl.days >= 3 ? 'd3' : 'd0'}>{pl.days}日目</span>
                       {'・'}
                       <button className="editdue"
-                        onClick={() => { setDraft(''); setEditing(r.id); }}>期限を入れる</button>
+                        onClick={() => { setDraft(''); setEditing(r.id); }}>期限を設定</button>
                     </>
                   )}
                 </span>
                 {r.nudges.length > 0 && (
-                  <span className="sub">{[...r.nudges].sort().map(formatShort).join('、')}に連絡</span>
+                  <span className="sub">{[...r.nudges].sort().map(formatShort).join('、')}に催促</span>
                 )}
                 <span className="exits-inline">
-                  <button className="linkish" onClick={() => p.onResolve(r.id, 'done')}>返事が来た</button>
+                  <button className="linkish" onClick={() => p.onResolve(r.id, 'done')}>回答あり</button>
                   <span className="sub">／</span>
-                  <button className="linkish" onClick={() => p.onResolve(r.id, 'dropped')}>取り下げる</button>
+                  <button className="linkish" onClick={() => p.onResolve(r.id, 'dropped')}>取り下げ</button>
                   {r.nudges.length >= 3 && (
                     <>
                       <span className="sub">／</span>
-                      <button className="linkish" onClick={() => p.onResolve(r.id, 'selfDid')}>自分でやる</button>
+                      <button className="linkish" onClick={() => p.onResolve(r.id, 'selfDid')}>自分で対応</button>
                     </>
                   )}
                 </span>
@@ -223,9 +223,9 @@ export default function StalledList(p: Props) {
 
       {hiddenCount > 0 || (expanded && open.length > VISIBLE) ? (
         <p className="more">
-          {hiddenCount > 0 && <>ほか{hiddenCount}件 ・ </>}
+          {hiddenCount > 0 && <>他{hiddenCount}件 ・ </>}
           <button className="linkish" onClick={() => setExpanded((v) => !v)}>
-            {expanded ? '畳む' : 'すべて見る'}
+            {expanded ? '折りたたむ' : 'すべて表示'}
           </button>
         </p>
       ) : null}
@@ -233,7 +233,7 @@ export default function StalledList(p: Props) {
       {closed.length > 0 && (
         <p className="more">
           <button className="linkish" onClick={() => setShowDone((v) => !v)}>
-            片づいたもの（{closed.length}件）
+            完了分（{closed.length}件）
           </button>
         </p>
       )}
@@ -241,7 +241,7 @@ export default function StalledList(p: Props) {
         <div className="item" key={r.id}>
           <div className="head">
             <span className="sub">{r.what}・<span className={p.masked ? 'masked' : undefined}>{r.who}</span></span>
-            <button className="linkish" onClick={() => p.onReopen(r.id)}>戻す</button>
+            <button className="linkish" onClick={() => p.onReopen(r.id)}>復元</button>
           </div>
         </div>
       ))}

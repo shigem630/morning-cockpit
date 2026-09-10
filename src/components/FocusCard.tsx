@@ -33,8 +33,8 @@ export default function FocusCard(p: Props) {
     return (
       <div className="card focus">
         <div>
-          <SectionTitle>今日の最優先</SectionTitle>
-          <h2 style={{ color: 'var(--text-muted)', fontSize: 20 }}>まず1つだけ書いてみましょう</h2>
+          <SectionTitle>本日の最優先</SectionTitle>
+          <h2 style={{ color: 'var(--text-muted)', fontSize: 20 }}>まず1件、登録してください</h2>
           <input
             className="textin" style={{ marginTop: 10 }} value={draft}
             placeholder="例：避難訓練の準備"
@@ -44,7 +44,7 @@ export default function FocusCard(p: Props) {
         </div>
         <div>
           <button className="primary" disabled={!draft.trim()}
-            onClick={() => p.onCreateFirst(draft.trim())}>これにする</button>
+            onClick={() => p.onCreateFirst(draft.trim())}>登録</button>
         </div>
       </div>
     );
@@ -57,10 +57,10 @@ export default function FocusCard(p: Props) {
     return (
       <div className="card focus">
         <div>
-          <SectionTitle>今日の最優先</SectionTitle>
-          <h2>{c ? c.title : '選べるものがありません'}</h2>
+          <SectionTitle>本日の最優先</SectionTitle>
+          <h2>{c ? c.title : '選択できる項目がありません'}</h2>
           {carried && (
-            <p className="sub" style={{ margin: '2px 0 0' }}>昨日、手をつけた続きです</p>
+            <p className="sub" style={{ margin: '2px 0 0' }}>昨日着手した案件の続きです</p>
           )}
           {c && dueLabel(c, p.today) && (
             <p className={`due${dueLabel(c, p.today)!.over ? ' over' : ''}`}>
@@ -69,8 +69,8 @@ export default function FocusCard(p: Props) {
           )}
         </div>
         <div className="acts">
-          {c && <button className="primary" onClick={() => p.onChoose(c.id)}>これでいい</button>}
-          <button onClick={p.onSkip}>別のにする</button>
+          {c && <button className="primary" onClick={() => p.onChoose(c.id)}>これに決定</button>}
+          <button onClick={p.onSkip}>別の候補</button>
         </div>
       </div>
     );
@@ -82,20 +82,20 @@ export default function FocusCard(p: Props) {
   return (
     <div className="card focus">
       <div>
-        <SectionTitle>今日の最優先</SectionTitle>
+        <SectionTitle>本日の最優先</SectionTitle>
         <h2 className={result === 'done' ? 'settled' : undefined}>{p.chosen.title}</h2>
-        {result === 'done' && <p className="note-done">終わりました。おつかれさまでした。</p>}
+        {result === 'done' && <p className="note-done">完了しました。おつかれさまでした。</p>}
         {result === 'started' && (
-          <p className="note-started">手をつけました。続きは明日の第一候補に出します。</p>
+          <p className="note-started">着手済みです。続きは翌朝の第一候補に表示します。</p>
         )}
         {!result && due && <p className={`due${due.over ? ' over' : ''}`}>{due.text}</p>}
       </div>
       <div style={{ textAlign: 'right' }}>
         <div className="acts">
           <button className="primary" aria-pressed={result === 'done'}
-            onClick={() => p.onResult('done')}>終わった</button>
+            onClick={() => p.onResult('done')}>完了</button>
           <button aria-pressed={result === 'started'}
-            onClick={() => p.onResult('started')}>手はつけた</button>
+            onClick={() => p.onResult('started')}>着手</button>
           <span className="when">
             {WHENS.map((w) => (
               <button key={w.key} aria-pressed={p.log.focusWhen === w.key}
@@ -107,7 +107,7 @@ export default function FocusCard(p: Props) {
         </div>
         <p className="sub" style={{ margin: '10px 0 0' }}>
           <button className="linkish" onClick={p.onReselect}>
-            {result ? '次のを選ぶ' : '別のにする'}
+            {result ? '次の候補を選ぶ' : '候補を変更'}
           </button>
           <span style={{ marginLeft: 14 }}>直近30日で{p.streak.hit}日</span>
         </p>
