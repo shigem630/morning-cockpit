@@ -201,6 +201,20 @@ export async function clearTaskBand(ids: string[]) {
   await b.commit();
 }
 
+/** 題名・〆切・重要を直す。
+    〆切を空にしたときは deleteField で消す。undefined を渡しても
+    ignoreUndefinedProperties が無視するので、いつまでも消えない。 */
+export async function editTask(
+  id: string,
+  patch: { title: string; important: boolean; dueDate: YMD | null },
+) {
+  await updateDoc(doc(tasksCol(), id), {
+    title: patch.title,
+    important: patch.important,
+    dueDate: patch.dueDate ?? deleteField(),
+  });
+}
+
 export async function addStalled(s: Omit<Stalled, 'id'>) {
   const id = crypto.randomUUID();
   await setDoc(doc(stalledCol(), id), s);

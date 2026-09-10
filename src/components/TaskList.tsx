@@ -12,6 +12,8 @@ interface Props {
   closed: Task[];     // 終わった・やらないことにしたもの（論理削除なので戻せる）
   manual: boolean;    // 自分で並べている状態か
   onAdd: (title: string, important: boolean, dueDate?: YMD) => void;
+  /** 題名・〆切・重要を直す。〆切を空にしたら null を渡す（消す意思と区別する）。 */
+  onEdit: (id: string, patch: { title: string; important: boolean; dueDate: YMD | null }) => void;
   onDone: (id: string) => void;
   onDelete: (id: string) => void;
   onRestore: (id: string) => void;
@@ -37,6 +39,22 @@ export default function TaskList(p: Props) {
   const [title, setTitle] = useState('');
   const [important, setImportant] = useState(false);
   const [due, setDue] = useState('');
+
+  // 直している最中の1件。開いている間、その行はつかめなくする。
+  const [editing, setEditing] = useState<string | null>(null);
+  const [eTitle, setETitle] = useState('');
+  const [eDue, setEDue] = useState('');
+  const [eImp, setEImp] = useState(false);
+
+  const startEdit = (t: Task) => {
+    setEditing(t.id); setETitle(t.title);
+    setEDue(t.dueDate ?? ''); setEImp(t.important);
+  };
+  const saveEdit = () => {
+    if (!editing || !eTitle.trim()) return;
+    p.onEdit(editing, { title: eTitle.trim(), important: eImp, dueDate: eDue || null });
+    setEditing(null);
+  };
 
   // つかんでいるもの／落とす先の目印。落とした時点で両方消す。
   const [dragId, setDragId] = useState<string | null>(null);
@@ -82,6 +100,33 @@ export default function TaskList(p: Props) {
 
   const row = (t: Task, i: number, band: Band, lastIndex: number) => {
     const d = dueLabel(t, p.today);
+
+    if (editing === t.id) {
+      return (
+        <div className="item task editing" key={t.id}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <input className="textin" style={{ flex: '1 1 220px' }} value={eTitle} autoFocus
+              onChange={(e) => setETitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') saveEdit();
+                if (e.key === 'Escape') setEditing(null);
+              }} />
+            <input className="textin" style={{ width: 150 }} type="date" value={eDue}
+              onChange={(e) => setEDue(e.target.value)} />
+            <label className="chk" style={{ fontSize: 14 }}>
+              <input type="checkbox" checked={eImp} onChange={(e) => setEImp(e.target.checked)} />
+              <span>重要</span>
+            </label>
+            <button className="primary" disabled={!eTitle.trim()} onClick={saveEdit}>直す</button>
+            <button onClick={() => setEditing(null)}>やめる</button>
+          </div>
+          <p className="legend" style={{ margin: '8px 0 0' }}>
+            〆切を空にすると「〆切なし」になります。
+          </p>
+        </div>
+      );
+    }
+
     const cls = ['item', 'task', dragId === t.id ? 'dragging' : '', overId === t.id ? 'over' : '']
       .filter(Boolean).join(' ');
     return (
@@ -100,7 +145,8 @@ export default function TaskList(p: Props) {
           <span className="left">
             <span className="grip" aria-hidden="true">⠿</span>
             <span className={`rank${band === 'first' ? ' top' : ''}`}>{i + 1}</span>
-            <span className="tname title-1line" title={t.title}>{t.title}</span>
+            <button className="tname title-1line editable" title="押すと直せます"
+              onClick={() => startEdit(t)}>{t.title}</button>
           </span>
           <span className="sub right">
             {t.important && <b className="badge">重要</b>}
@@ -112,6 +158,8 @@ export default function TaskList(p: Props) {
               <button className="act mv" disabled={i === lastIndex}
                 aria-label="下へ動かす" title="下へ動かす"
                 onClick={() => move(band, i, 1)}>↓</button>
+              <button className="act" onClick={() => startEdit(t)}
+                title="題名・〆切・重要を直します。">直す</button>
               <button className="act ok" onClick={() => p.onDone(t.id)}
                 title="やり切ったものとして一覧から外します。あとで戻せます。">終わった</button>
               <button className="act" onClick={() => p.onDelete(t.id)}

@@ -7,7 +7,7 @@ import {
 import { eligibleRoutines, last30Days } from './lib/eligible';
 import { isManualOrder, isOpen, sortTasks } from './lib/priority';
 import {
-  addStalled, addTask, clearFocus, clearTaskOrder, nudge, reopenStalled, reorderTasks,
+  addStalled, addTask, clearFocus, clearTaskOrder, editTask, nudge, reopenStalled, reorderTasks,
   resolveStalled, restoreTask, setFocus, setStalledDue, setWorked, toggleCheck, unnudge,
   updateTask, useDayLog, useRecentLogs, useStalled, useTasks, useYesterdayLog,
 } from './lib/store';
@@ -427,6 +427,7 @@ function Cockpit({ user }: { user: User }) {
                 addTask({
                   title, important, dueDate, createdAt: today, order: nextTopOrder(),
                 })}
+              onEdit={(id, patch) => editTask(id, patch)}
               onDone={(id) => updateTask(id, { doneAt: today })}
               onDelete={(id) => updateTask(id, { deletedAt: today })}
               onRestore={(id) => restoreTask(id)}
