@@ -299,6 +299,26 @@ function Cockpit({ user }: { user: User }) {
     return (os.length ? Math.min(...os) : 1) - 1;
   };
 
+  /* ───── スマホの切り替えタブ ─────
+     1列に全部積むとスクロールが長すぎる。区分ごとに1画面にして、下のタブで切り替える。 */
+  type PhoneTab = 'tasks' | 'schedule' | 'stalled' | 'routine';
+  const [tab, setTab] = useState<PhoneTab>(() => {
+    try { return (localStorage.getItem('mc.tab') as PhoneTab) || 'tasks'; } catch { return 'tasks'; }
+  });
+  const pickTab = (t: PhoneTab) => {
+    setTab(t);
+    try { localStorage.setItem('mc.tab', t); } catch { /* 覚えられなくても動く */ }
+    window.scrollTo(0, 0);
+  };
+  const openStalled = stalled.filter((r) => !r.resolvedAt).length;
+  const routineLeft = eligible.filter((r) => !log.checked.includes(r.id)).length;
+  const tabs: { key: PhoneTab; label: string; count?: number }[] = [
+    { key: 'tasks', label: 'タスク', count: openTasks.length },
+    { key: 'schedule', label: '予定', count: cal.kind === 'ok' ? cal.events.length : undefined },
+    { key: 'stalled', label: '回答待ち', count: openStalled },
+    { key: 'routine', label: '定例', count: working ? routineLeft : undefined },
+  ];
+
   /* ───── 操作 ───── */
   const eligibleIds = eligible.map((r) => r.id);
 
@@ -327,7 +347,7 @@ function Cockpit({ user }: { user: User }) {
     <>
       {/* スマホでは cols / stack の囲いを外して1列にし、slot の順番を CSS で入れ替える。
           （タスクの追加をいちばん手前に。パソコンの並びはそのまま） */}
-      <div className="wrap cockpit">
+      <div className="wrap cockpit" data-tab={tab}>
         <TopBar
           today={today} theme={theme} onTheme={setTheme}
           masked={masked} onMask={() => setMasked((v) => !v)}
@@ -432,6 +452,16 @@ function Cockpit({ user }: { user: User }) {
           </div>
         )}
       </div>
+
+      {/* スマホのときだけ出る（CSS で切り替え） */}
+      <nav className="tabbar" aria-label="表示の切り替え">
+        {tabs.map((t) => (
+          <button key={t.key} aria-pressed={tab === t.key} onClick={() => pickTab(t.key)}>
+            <span className="tl">{t.label}</span>
+            {t.count !== undefined && <span className="tc">{t.count}</span>}
+          </button>
+        ))}
+      </nav>
     </>
   );
 }

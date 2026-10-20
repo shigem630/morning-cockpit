@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { formatLong, holidayName, type YMD } from '../lib/dates';
 
 export type Theme = 'auto' | 'light' | 'dark';
@@ -16,13 +17,18 @@ interface Props {
 
 export default function TopBar(p: Props) {
   const hol = holidayName(p.today);
+  // スマホでは日付だけを出し、表示切替やログアウトは「設定」の中へしまう。
+  const [menu, setMenu] = useState(false);
   return (
     <div className="top">
       <div className="date">
         {formatLong(p.today)}
         {hol && <span className="sub" style={{ marginLeft: 4 }}>{hol}</span>}
       </div>
-      <div className="right">
+      <button className="menu-btn" aria-expanded={menu} onClick={() => setMenu((v) => !v)}>
+        {menu ? '閉じる' : '設定'}
+      </button>
+      <div className={`right${menu ? ' open' : ''}`}>
         <button onClick={p.onMask} aria-pressed={p.masked}>
           {p.masked ? '表示' : '非表示'}
         </button>

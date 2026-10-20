@@ -44,6 +44,8 @@ export default function TaskList(p: Props) {
   // ドラッグは指では使えない（長押しが画面のスクロールとぶつかる）ので、矢印だけにする。
   const phone = useMedia(PHONE_QUERY);
   const showAdd = adding || phone;
+  // スマホでは操作ボタンを畳んでおき、押した行だけ開く。全行に6個ずつ並ぶと、それだけで画面が埋まる。
+  const [openId, setOpenId] = useState<string | null>(null);
 
   // 直している最中の1件。開いている間、その行はつかめなくする。
   const [editing, setEditing] = useState<string | null>(null);
@@ -139,7 +141,9 @@ export default function TaskList(p: Props) {
       );
     }
 
-    const cls = ['item', 'task', dragId === t.id ? 'dragging' : '', overId === t.id ? 'over' : '']
+    const showActs = !phone || openId === t.id;
+    const cls = ['item', 'task', dragId === t.id ? 'dragging' : '', overId === t.id ? 'over' : '',
+      phone && openId === t.id ? 'open' : '']
       .filter(Boolean).join(' ');
     return (
       <div
@@ -157,13 +161,17 @@ export default function TaskList(p: Props) {
           <span className="left">
             <span className="grip" aria-hidden="true">⠿</span>
             <span className={`rank${band === 'first' ? ' top' : ''}`}>{i + 1}</span>
-            <button className="tname title-1line editable" title="クリックすると編集できます"
-              onClick={() => startEdit(t)}>{t.title}</button>
+            <button className="tname title-1line editable"
+              title={phone ? undefined : 'クリックすると編集できます'}
+              aria-expanded={phone ? openId === t.id : undefined}
+              onClick={() => (phone ? setOpenId(openId === t.id ? null : t.id) : startEdit(t))}>
+              {t.title}
+            </button>
           </span>
           <span className="sub right">
             {t.important && <b className="badge">重要</b>}
             <span className={dueClass(t, p.today)}>{d ? d.text : '期限なし'}</span>
-            <span className="rowacts">
+            {showActs && <span className="rowacts">
               <button className="act mv" disabled={i === 0}
                 aria-label="上へ移動" title="上へ移動"
                 onClick={() => move(band, i, -1)}>↑</button>
@@ -181,7 +189,7 @@ export default function TaskList(p: Props) {
                 title="実施済みとして一覧から外します。あとで復元できます。">完了</button>
               <button className="act" onClick={() => p.onDelete(t.id)}
                 title="実施せずに一覧から外します。あとで復元できます。">取りやめ</button>
-            </span>
+            </span>}
           </span>
         </div>
       </div>
@@ -217,9 +225,11 @@ export default function TaskList(p: Props) {
 
       {p.tasks.length > 0 && (
         <p className="legend">
-          {phone ? '矢印で並べ替えられます。' : '行をドラッグして並べ替えられます（矢印でも移動できます）。'}　
-          <b>完了</b>＝実施済み　<b>取りやめ</b>＝実施せず一覧から除外
-          （いずれも下の履歴から復元できます）
+          {phone ? 'タスク名を押すと、完了・編集などのボタンが出ます。' : (<>
+            行をドラッグして並べ替えられます（矢印でも移動できます）。　
+            <b>完了</b>＝実施済み　<b>取りやめ</b>＝実施せず一覧から除外
+            （いずれも下の履歴から復元できます）
+          </>)}
         </p>
       )}
 
@@ -229,13 +239,16 @@ export default function TaskList(p: Props) {
             enterKeyHint="done"
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') submit(); }} />
-          <input className="textin" style={{ width: 160 }} type="date" value={due}
-            onChange={(e) => setDue(e.target.value)} />
-          <label className="chk" style={{ fontSize: 14 }}>
-            <input type="checkbox" checked={important}
-              onChange={(e) => setImportant(e.target.checked)} />
-            <span>重要</span>
-          </label>
+          {(!phone || title.trim()) && (<>
+            {phone && <span className="break" aria-hidden="true" />}
+            <input className="textin" style={{ width: 160 }} type="date" value={due}
+              aria-label="期限" onChange={(e) => setDue(e.target.value)} />
+            <label className="chk" style={{ fontSize: 14 }}>
+              <input type="checkbox" checked={important}
+                onChange={(e) => setImportant(e.target.checked)} />
+              <span>重要</span>
+            </label>
+          </>)}
           <button className="primary" disabled={phone && !title.trim()} onClick={submit}>追加</button>
         </div>
       )}
