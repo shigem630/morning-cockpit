@@ -33,13 +33,13 @@ export default function TopBar(p: Props) {
             </button>
           ))}
         </span>
-        <button onClick={p.onExport} disabled={p.exporting}
+        <button className="hide-phone" onClick={p.onExport} disabled={p.exporting}
           title="現在のデータをすべてファイルに出力します（バックアップ）">
           {p.exporting ? '出力中…' : 'バックアップ'}
         </button>
-        <span>{p.userName}</span>
+        <span className="hide-phone">{p.userName}</span>
         <button onClick={p.onLogout}>ログアウト</button>
-        <span className="build">build {__BUILD_TIME__}</span>
+        <span className="build hide-phone">build {__BUILD_TIME__}</span>
       </div>
     </div>
   );

@@ -180,9 +180,63 @@ button[aria-pressed="true"].primary { background:var(--accent); color:#fff; }
 .gate .card { margin-top:22px; text-align:left; }
 .gate button.primary { font-size:16px; padding:10px 22px; }
 
-/* ───── スマホ ───── */
-.toonarrow { display:none; }
+/* ───── 並べ替え用の囲い。中身が空（重要・緊急でない が無い日）なら場所を取らない ───── */
+.slot:empty { display:none; }
+
+/* ───── タブレット幅：3列は窮屈なので2列に ───── */
 @media (max-width: 1023px) {
-  .desktop-only { display:none; }
-  .toonarrow { display:block; padding:40px 24px; font-size:16px; line-height:1.9; }
+  .cols { grid-template-columns: 1fr 1fr; }
+  .cols .slot-schedule { grid-column: 1 / -1; }
+}
+
+/* ───── スマホ（iPhone）─────
+   境目は src/lib/useMedia.ts の PHONE_QUERY と揃えること。
+   1列にして、タスクを最優先のすぐ下へ。予定・回答待ち・定例はその下。 */
+@media (max-width: 760px) {
+  .wrap {
+    padding: env(safe-area-inset-top) max(12px, env(safe-area-inset-right))
+             calc(32px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+  .cockpit { display:flex; flex-direction:column; gap:12px; }
+  .cockpit .cols, .cockpit .stack { display:contents; }
+  .cockpit > .banner, .cockpit > .card { margin-bottom:0 !important; }
+  .slot-focus { order:1; } .slot-tasks { order:2; } .slot-schedule { order:3; }
+  .slot-stalled { order:4; } .slot-routine { order:5; } .slot-soon { order:6; }
+
+  .card { padding:16px; }
+
+  /* 上の帯：日付を1行目、操作を2行目に */
+  .top { flex-wrap:wrap; gap:8px; padding:10px 0 2px; }
+  .top .right { gap:8px; }
+  .hide-phone { display:none !important; }
+
+  /* 最優先：縦に積む */
+  .focus { flex-direction:column; align-items:stretch; gap:14px; min-height:0; }
+  .focus h2 { font-size:20px; }
+  .focus > div { text-align:left !important; }
+  .acts { justify-content:flex-start; }
+  .when { margin-left:0; }
+
+  /* 入力欄は横いっぱい。16px 未満にすると iPhone が勝手に拡大する */
+  .card .textin { width:100% !important; flex:1 1 100% !important; }
+  /* 追加欄：件名を1行目、期限・重要・追加ボタンを2行目に並べる */
+  .addrow { align-items:center; }
+  .addrow input[type="date"] { flex:1 1 0 !important; width:auto !important; min-width:0; }
+  .addrow .chk { padding:0; }
+
+  /* タスク：題名は折り返して全部見せる。操作は2行目へ */
+  .item.task .head { flex-direction:column; align-items:stretch; gap:6px; }
+  .item.task .right { flex-wrap:wrap; white-space:normal; padding-left:32px; gap:8px; }
+  .item.task .title-1line { white-space:normal; overflow:visible; }
+  .item.task, .item.task:active { cursor:default; }
+  .grip { display:none; }
+  .rowacts { margin-left:0; gap:6px; flex-wrap:wrap; }
+  /* 指で押せる大きさに（目安 36px） */
+  .act { font-size:13px; line-height:34px; padding:0 12px; }
+  .act.mv { padding:0 12px; }
+  button { padding:8px 14px; }
+  .band.first { padding:12px 12px 6px; }
+
+  .item.stall .exits-inline { margin-left:0; }
+  .chk { padding:8px 0; }
 }

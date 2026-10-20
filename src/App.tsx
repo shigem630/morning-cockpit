@@ -325,12 +325,9 @@ function Cockpit({ user }: { user: User }) {
 
   return (
     <>
-      <div className="toonarrow">
-        <strong>この画面はパソコン向けです。</strong><br />
-        スマートフォンからは、Discordのエステルをご利用ください。
-      </div>
-
-      <div className="wrap desktop-only">
+      {/* スマホでは cols / stack の囲いを外して1列にし、slot の順番を CSS で入れ替える。
+          （タスクの追加をいちばん手前に。パソコンの並びはそのまま） */}
+      <div className="wrap cockpit">
         <TopBar
           today={today} theme={theme} onTheme={setTheme}
           masked={masked} onMask={() => setMasked((v) => !v)}
@@ -376,7 +373,7 @@ function Cockpit({ user }: { user: User }) {
         )}
 
         {tasks.length === 0 ? null : (
-          <FocusCard
+          <div className="slot slot-focus"><FocusCard
             today={today} candidate={candidate} chosen={chosen} log={log}
             hasAnyTask={openTasks.length > 0} streak={streak} carriedOver={carriedOver}
             onChoose={(id) => setFocus(today, { focusTaskId: id, focusResult: null })}
@@ -391,11 +388,11 @@ function Cockpit({ user }: { user: User }) {
               const id = await addTask({ title, important: true, createdAt: today });
               setFocus(today, { focusTaskId: id, focusResult: null });
             }}
-          />
+          /></div>
         )}
 
         <div className="cols">
-          <StalledList
+          <div className="slot slot-stalled"><StalledList
             today={today} rows={stalled} masked={masked}
             onNudge={(id) => nudge(id, today)}
             onUnnudge={(id) => unnudge(id, today)}
@@ -404,23 +401,23 @@ function Cockpit({ user }: { user: User }) {
             onDue={(id, dueDate) => setStalledDue(id, dueDate)}
             onAdd={(who, what, dueDate) =>
               addStalled({ who, what, dueDate, requestedAt: today, nudges: [] })}
-          />
-          <RoutineChecks
+          /></div>
+          <div className="slot slot-routine"><RoutineChecks
             eligible={eligible} log={log}
             calendarSaysWork={calendarSaysWork} working={working}
             onToggle={(id, on) => toggleCheck(today, id, on, eligibleIds)}
             onSetWorking={(v) => setWorked(today, v)}
-          />
-          <TodaySchedule
+          /></div>
+          <div className="slot slot-schedule"><TodaySchedule
             state={cal} nowHHMM={nowHHMM()} when={log.focusWhen ?? null}
             onLoad={loadCalendar}
-          />
+          /></div>
         </div>
 
         {tasks.length > 0 && (
           <div className="stack">
-            <SoonCard today={today} task={soon} />
-            <TaskList
+            <div className="slot slot-soon"><SoonCard today={today} task={soon} /></div>
+            <div className="slot slot-tasks"><TaskList
               today={today} tasks={openTasks} closed={closedTasks}
               manual={manual} onReorder={applyOrder} onAuto={backToAuto}
               onAdd={(title, important, dueDate) =>
@@ -431,7 +428,7 @@ function Cockpit({ user }: { user: User }) {
               onDone={(id) => updateTask(id, { doneAt: today })}
               onDelete={(id) => updateTask(id, { deletedAt: today })}
               onRestore={(id) => restoreTask(id)}
-            />
+            /></div>
           </div>
         )}
       </div>

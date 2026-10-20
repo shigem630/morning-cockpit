@@ -42,7 +42,7 @@ export default function RoutineChecks(p: Props) {
           onChange={(e) => p.onToggle(r.id, e.target.checked)} />
         <span>{r.label}</span>
         {num !== null && (
-          <span className="sub" style={{ marginLeft: 'auto', opacity: .5 }}>{num}</span>
+          <span className="sub hide-phone" style={{ marginLeft: 'auto', opacity: .5 }}>{num}</span>
         )}
       </label>
     );

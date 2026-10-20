@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Task } from '../types';
 import { dueLabel, isUrgent } from '../lib/priority';
 import { dayCount, type YMD } from '../lib/dates';
+import { PHONE_QUERY, useMedia } from '../lib/useMedia';
 import SectionTitle from './SectionTitle';
 
 type Band = 'first' | 'rest';
@@ -39,6 +40,10 @@ export default function TaskList(p: Props) {
   const [title, setTitle] = useState('');
   const [important, setImportant] = useState(false);
   const [due, setDue] = useState('');
+  // スマホでは追加欄を開いたままにする。エステルに頼まずに、ここで打ち込めるように。
+  // ドラッグは指では使えない（長押しが画面のスクロールとぶつかる）ので、矢印だけにする。
+  const phone = useMedia(PHONE_QUERY);
+  const showAdd = adding || phone;
 
   // 直している最中の1件。開いている間、その行はつかめなくする。
   const [editing, setEditing] = useState<string | null>(null);
@@ -76,6 +81,13 @@ export default function TaskList(p: Props) {
     if (j < 0 || j >= arr.length) return;
     [arr[i], arr[j]] = [arr[j], arr[i]];
     if (band === 'first') commit(arr, restList); else commit(firstList, arr);
+  };
+
+  /** 帯を移す（スマホ用。ドラッグの代わり）。優先へは末尾に、その他へは先頭に入れる。 */
+  const switchBand = (t: Task) => {
+    const f = firstList.filter((x) => x.id !== t.id);
+    const r = restList.filter((x) => x.id !== t.id);
+    if (t.first) commit(f, [t, ...r]); else commit([...f, t], r);
   };
 
   /** targetId の「上」に差し込む。targetId が null なら、その帯のいちばん下。 */
@@ -131,7 +143,7 @@ export default function TaskList(p: Props) {
       .filter(Boolean).join(' ');
     return (
       <div
-        className={cls} key={t.id} draggable
+        className={cls} key={t.id} draggable={!phone}
         onDragStart={(e) => { setDragId(t.id); e.dataTransfer.effectAllowed = 'move'; }}
         onDragEnd={() => { setDragId(null); setOverId(null); setOverBand(null); }}
         onDragOver={(e) => {
@@ -158,6 +170,11 @@ export default function TaskList(p: Props) {
               <button className="act mv" disabled={i === lastIndex}
                 aria-label="下へ移動" title="下へ移動"
                 onClick={() => move(band, i, 1)}>↓</button>
+              {phone && (
+                <button className="act" onClick={() => switchBand(t)}>
+                  {band === 'first' ? 'その他へ' : '優先へ'}
+                </button>
+              )}
               <button className="act" onClick={() => startEdit(t)}
                 title="件名・期限・重要度を編集します">編集</button>
               <button className="act ok" onClick={() => p.onDone(t.id)}
@@ -192,21 +209,24 @@ export default function TaskList(p: Props) {
           {p.manual && (
             <button className="linkish" onClick={p.onAuto}>並び順を自動に戻す</button>
           )}
-          <button onClick={() => setAdding((v) => !v)}>{adding ? 'キャンセル' : '追加'}</button>
+          {!phone && (
+            <button onClick={() => setAdding((v) => !v)}>{adding ? 'キャンセル' : '追加'}</button>
+          )}
         </span>
       </div>
 
       {p.tasks.length > 0 && (
         <p className="legend">
-          行をドラッグして並べ替えられます（矢印でも移動できます）。　
+          {phone ? '矢印で並べ替えられます。' : '行をドラッグして並べ替えられます（矢印でも移動できます）。'}　
           <b>完了</b>＝実施済み　<b>取りやめ</b>＝実施せず一覧から除外
           （いずれも下の履歴から復元できます）
         </p>
       )}
 
-      {adding && (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
-          <input className="textin" placeholder="件名" value={title}
+      {showAdd && (
+        <div className="addrow" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+          <input className="textin title" placeholder={phone ? 'タスクを追加' : '件名'} value={title}
+            enterKeyHint="done"
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') submit(); }} />
           <input className="textin" style={{ width: 160 }} type="date" value={due}
@@ -216,7 +236,7 @@ export default function TaskList(p: Props) {
               onChange={(e) => setImportant(e.target.checked)} />
             <span>重要</span>
           </label>
-          <button className="primary" onClick={submit}>追加</button>
+          <button className="primary" disabled={phone && !title.trim()} onClick={submit}>追加</button>
         </div>
       )}
 
@@ -230,7 +250,9 @@ export default function TaskList(p: Props) {
           >
             <p className="bandname">優先<span className="note">本日、優先して着手するもの</span></p>
             {firstList.length === 0
-              ? <p className="drophint">ここへドラッグすると、優先に移動します。</p>
+              ? <p className="drophint">
+                  {phone ? '各タスクの「優先へ」で、ここに移動します。' : 'ここへドラッグすると、優先に移動します。'}
+                </p>
               : firstList.map((t, i) => row(t, i, 'first', firstList.length - 1))}
             {firstList.length > 5 && (
               <p className="drophint">

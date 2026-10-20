@@ -2,10 +2,23 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- viewport-fit=cover：ホーム画面から開いたとき、画面の上下いっぱいまで使う（余白は CSS の safe-area で取る） -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>朝の司令塔</title>
-    <script type="module" crossorigin src="/morning-cockpit/assets/index-W_nlhucy.js"></script>
-    <link rel="stylesheet" crossorigin href="/morning-cockpit/assets/index-DVXV5vNu.css">
+
+    <!-- iPhone のホーム画面に置いたとき、Safari の枠なしで開くための設定。
+         サービスワーカーは入れない。古い版が手元に残り「更新したのに反映されない」を生むため。
+         データの手元保存は Firestore の機能で足りている。 -->
+    <link rel="manifest" href="/morning-cockpit/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/morning-cockpit/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="司令塔" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#16161A" media="(prefers-color-scheme: dark)" />
+    <script type="module" crossorigin src="/morning-cockpit/assets/index-93OEyrqu.js"></script>
+    <link rel="stylesheet" crossorigin href="/morning-cockpit/assets/index-B4qzo6mL.css">
   </head>
   <body>
     <div id="root"></div>
