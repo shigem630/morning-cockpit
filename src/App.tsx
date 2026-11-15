@@ -18,6 +18,7 @@ import { buildBackup, downloadJson } from './lib/export';
 import { INITIAL_TASKS } from './data/initialTasks';
 import type { Stalled, WhenTag } from './types';
 import SectionTitle from './components/SectionTitle';
+import RoadmapCard from './components/RoadmapCard';
 import TopBar, { type Theme } from './components/TopBar';
 import { ClockSkewBanner, HolidayTableBanner, SyncBanner } from './components/Banners';
 import FocusCard from './components/FocusCard';
@@ -369,6 +370,8 @@ function Cockpit({ user }: { user: User }) {
         )}
         <ClockSkewBanner skewMs={skew} />
         <HolidayTableBanner today={today} />
+
+        <div className="slot slot-roadmap"><RoadmapCard today={today} /></div>
 
         {help && (
           <div className="card" style={{ marginBottom: 14 }}>

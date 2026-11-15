@@ -203,11 +203,12 @@ button[aria-pressed="true"].primary { background:var(--accent); color:#fff; }
   .cockpit { display:flex; flex-direction:column; gap:12px; }
   .cockpit .cols, .cockpit .stack { display:contents; }
   .cockpit > .banner, .cockpit > .card { margin-bottom:0 !important; }
-  .slot-focus { order:1; } .slot-tasks { order:2; }
+  .slot-roadmap { order:0; } .slot-focus { order:1; } .slot-tasks { order:2; }
 
   /* 下のタブで区分を切り替える。選んでいる区分だけを出す。
      「重要・緊急でない」はタスク一覧と中身が重なるので、スマホでは出さない。 */
   .cockpit .slot { display:none; }
+  .cockpit[data-tab="tasks"] .slot-roadmap,
   .cockpit[data-tab="tasks"] .slot-focus,
   .cockpit[data-tab="tasks"] .slot-tasks,
   .cockpit[data-tab="schedule"] .slot-schedule,
@@ -280,3 +281,17 @@ button[aria-pressed="true"].primary { background:var(--accent); color:#fff; }
   .item.stall .exits-inline { margin-left:0; }
   .chk { padding:8px 0; }
 }
+
+/* 改革の地図（RoadmapCard） */
+.roadmap { border-left:3px solid var(--accent); }
+.rm-goal { margin:0 0 10px; font-weight:600; }
+.rm-row { display:grid; grid-template-columns:1fr 1fr; gap:10px 18px; }
+.rm-row > div { line-height:1.6; }
+.rm-k { display:inline-block; font-size:12px; color:var(--text-muted); margin-right:8px; }
+.rm-note { display:block; font-size:12px; }
+.rm-after { margin:8px 0 0; font-size:12px; }
+.rm-more { margin-top:8px; }
+.rm-more summary { cursor:pointer; font-size:12px; color:var(--text-muted); }
+.rm-list { margin:8px 0 0; padding-left:18px; line-height:1.7; }
+.rm-list li[aria-current="step"] { color:var(--accent); }
+@media (max-width: 760px) { .rm-row { grid-template-columns:1fr; } }
