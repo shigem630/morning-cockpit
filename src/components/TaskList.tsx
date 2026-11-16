@@ -64,6 +64,14 @@ export default function TaskList(p: Props) {
   const [eImp, setEImp] = useState(false);
   const [eStart, setEStart] = useState('');
   const [dateErr, setDateErr] = useState<string | null>(null);
+  // 「これから始まる」は畳んでおく。開いたままだと、今日のタスクと混ざって見づらい。
+  const [upOpen, setUpOpen] = useState(() => {
+    try { return localStorage.getItem('mc.upOpen') === '1'; } catch { return false; }
+  });
+  const toggleUp = () => setUpOpen((v) => {
+    try { localStorage.setItem('mc.upOpen', v ? '0' : '1'); } catch { /* 覚えられなくても動く */ }
+    return !v;
+  });
 
   const startEdit = (t: Task) => {
     setEditing(t.id); setETitle(t.title);
@@ -237,6 +245,7 @@ export default function TaskList(p: Props) {
   const hidden = restList.length - shownRest.length;
 
   return (
+    <>
     <div className="card">
       <div className="rowbar">
         <SectionTitle note={`全${p.tasks.length}件`}>タスク</SectionTitle>
@@ -330,36 +339,6 @@ export default function TaskList(p: Props) {
         </>
       )}
 
-      {p.upcoming.length > 0 && (() => {
-        const near = p.upcoming.filter((t) => daysBetween(p.today, t.startDate!) <= PREVIEW_DAYS);
-        const later = p.upcoming.length - near.length;
-        return (
-          <div className="band upcoming">
-            <p className="bandname">
-              これから始まる<span className="note">{PREVIEW_DAYS}日以内に始める日が来るもの</span>
-            </p>
-            {near.length === 0 && <p className="drophint">{PREVIEW_DAYS}日以内に始まるものはありません。</p>}
-            {near.map((t) => editing === t.id ? row(t, 0, 'rest', 0) : (
-              <div className="item" key={t.id}>
-                <div className="head">
-                  <span className="title-1line" title={t.title}>{t.title}</span>
-                  <span className="sub right">
-                    {t.important && <b className="badge">重要</b>}
-                    <span>{fmtMD(t.startDate!)}から{t.dueDate ? `・期限 ${fmtMD(t.dueDate)}` : ''}</span>
-                    <button className="act" onClick={() => startEdit(t)}>編集</button>
-                  </span>
-                </div>
-              </div>
-            ))}
-            {later > 0 && (
-              <p className="more">
-                その先にあと{later}件 ・ <button className="linkish" onClick={p.onOpenAll}>全体を見る</button>
-              </p>
-            )}
-          </div>
-        );
-      })()}
-
       {p.closed.length > 0 && (
         <p className="more">
           <button className="linkish" onClick={() => setShowClosed((v) => !v)}>
@@ -379,6 +358,42 @@ export default function TaskList(p: Props) {
         </div>
       ))}
     </div>
+
+    {p.upcoming.length > 0 && (() => {
+      const near = p.upcoming.filter((t) => daysBetween(p.today, t.startDate!) <= PREVIEW_DAYS);
+      const later = p.upcoming.length - near.length;
+      const next = p.upcoming[0];
+      return (
+        <div className="card upcoming-card">
+          <div className="rowbar">
+            <SectionTitle note={`${PREVIEW_DAYS}日以内 ${near.length}件・その先 ${later}件`}>これから始まる</SectionTitle>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <button className="linkish" onClick={toggleUp}>{upOpen ? '閉じる' : '開く'}</button>
+              <button onClick={p.onOpenAll}>全体を見る</button>
+            </span>
+          </div>
+          {!upOpen && (
+            <p className="legend" style={{ margin: 0 }}>
+              次に始まるもの：{fmtMD(next.startDate!)}　{next.title}
+            </p>
+          )}
+          {upOpen && near.length === 0 && <p className="drophint">{PREVIEW_DAYS}日以内に始まるものはありません。</p>}
+          {upOpen && near.map((t) => editing === t.id ? row(t, 0, 'rest', 0) : (
+            <div className="item" key={t.id}>
+              <div className="head">
+                <span className="title-1line" title={t.title}>{t.title}</span>
+                <span className="sub right">
+                  {t.important && <b className="badge">重要</b>}
+                  <span>{fmtMD(t.startDate!)}から{t.dueDate ? `・期限 ${fmtMD(t.dueDate)}` : ''}</span>
+                  <button className="act" onClick={() => startEdit(t)}>編集</button>
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    })()}
+    </>
   );
 }
 

@@ -298,7 +298,9 @@ button[aria-pressed="true"].primary { background:var(--accent); color:#fff; }
 
 /* 始める日・全体の画面（2026-11-16） */
 .dlabel { display:inline-flex; align-items:center; gap:6px; font-size:13px; }
-.band.upcoming { opacity:.6; }
-.band.upcoming .act { margin-left:8px; }
+.upcoming-card { margin-top:14px; border-style:dashed; background:var(--surface-sub); }
+.upcoming-card .item { opacity:.7; }
+.upcoming-card .act { margin-left:8px; }
+@media (max-width: 760px) { .upcoming-card { margin-top:12px; } }
 .yearview .ymonth { margin-top:14px; }
 .badge.new { color:var(--accent); }
