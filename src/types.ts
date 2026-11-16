@@ -5,6 +5,9 @@ export interface Task {
   title: string;
   important: boolean;
   dueDate?: YMD;
+  /** 始める日。この日になるまで、毎朝の一覧には出さない（全体の画面にだけ出す）。
+      未設定は「もう始まっている」扱い。 */
+  startDate?: YMD;
   createdAt: YMD;
   /** 「先にやる」帯に入れているか。未設定は「そのほか」。
       〆切から自動で決めない。どれを先にやるかは本人が決めることにする。 */

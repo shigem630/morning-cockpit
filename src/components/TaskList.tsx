@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import type { Task } from '../types';
-import { dueLabel, isUrgent } from '../lib/priority';
-import { dayCount, type YMD } from '../lib/dates';
+import { dueLabel, isEarlyByDue, isJustStarted, isUrgent } from '../lib/priority';
+import { dayCount, daysBetween, type YMD } from '../lib/dates';
+
+const fmtMD = (ymd: YMD) => { const [, m, d] = ymd.split('-').map(Number); return `${m}/${d}`; };
 import { PHONE_QUERY, useMedia } from '../lib/useMedia';
 import SectionTitle from './SectionTitle';
 
@@ -12,9 +14,14 @@ interface Props {
   tasks: Task[];      // 並び替え済み・未完了のみ（帯 → 順番 の順で並んでいる）
   closed: Task[];     // 終わった・やらないことにしたもの（論理削除なので戻せる）
   manual: boolean;    // 自分で並べている状態か
-  onAdd: (title: string, important: boolean, dueDate?: YMD) => void;
+  /** 始める日がまだ来ていないもの（始める日の早い順）。下に薄く予告として出す。 */
+  upcoming: Task[];
+  onOpenAll: () => void;
+  onAdd: (title: string, important: boolean, dueDate?: YMD, startDate?: YMD) => void;
   /** 題名・〆切・重要を直す。〆切を空にしたら null を渡す（消す意思と区別する）。 */
-  onEdit: (id: string, patch: { title: string; important: boolean; dueDate: YMD | null }) => void;
+  onEdit: (id: string, patch: {
+    title: string; important: boolean; dueDate: YMD | null; startDate: YMD | null;
+  }) => void;
   onDone: (id: string) => void;
   onDelete: (id: string) => void;
   onRestore: (id: string) => void;
@@ -24,6 +31,8 @@ interface Props {
 }
 
 const VISIBLE = 5;
+/** 予告に出す範囲。これより先は「全体」の画面で見る。 */
+const PREVIEW_DAYS = 14;
 
 /** 〆切の切迫。色は3段階まで。赤を増やすと、どれも急ぎに見えて効かなくなる。 */
 function dueClass(t: Task, today: YMD): string {
@@ -40,6 +49,7 @@ export default function TaskList(p: Props) {
   const [title, setTitle] = useState('');
   const [important, setImportant] = useState(false);
   const [due, setDue] = useState('');
+  const [start, setStart] = useState('');
   // スマホでは追加欄を開いたままにする。エステルに頼まずに、ここで打ち込めるように。
   // ドラッグは指では使えない（長押しが画面のスクロールとぶつかる）ので、矢印だけにする。
   const phone = useMedia(PHONE_QUERY);
@@ -52,14 +62,20 @@ export default function TaskList(p: Props) {
   const [eTitle, setETitle] = useState('');
   const [eDue, setEDue] = useState('');
   const [eImp, setEImp] = useState(false);
+  const [eStart, setEStart] = useState('');
+  const [dateErr, setDateErr] = useState<string | null>(null);
 
   const startEdit = (t: Task) => {
     setEditing(t.id); setETitle(t.title);
-    setEDue(t.dueDate ?? ''); setEImp(t.important);
+    setEDue(t.dueDate ?? ''); setEImp(t.important); setEStart(t.startDate ?? '');
   };
   const saveEdit = () => {
     if (!editing || !eTitle.trim()) return;
-    p.onEdit(editing, { title: eTitle.trim(), important: eImp, dueDate: eDue || null });
+    if (eStart && eDue && eStart > eDue) { setDateErr('始める日が期限より後になっています。'); return; }
+    setDateErr(null);
+    p.onEdit(editing, {
+      title: eTitle.trim(), important: eImp, dueDate: eDue || null, startDate: eStart || null,
+    });
     setEditing(null);
   };
 
@@ -108,8 +124,10 @@ export default function TaskList(p: Props) {
 
   const submit = () => {
     if (!title.trim()) return;
-    p.onAdd(title.trim(), important, due || undefined);
-    setTitle(''); setImportant(false); setDue(''); setAdding(false);
+    if (start && due && start > due) { setDateErr('始める日が期限より後になっています。'); return; }
+    setDateErr(null);
+    p.onAdd(title.trim(), important, due || undefined, start || undefined);
+    setTitle(''); setImportant(false); setDue(''); setStart(''); setAdding(false);
   };
 
   const row = (t: Task, i: number, band: Band, lastIndex: number) => {
@@ -125,8 +143,14 @@ export default function TaskList(p: Props) {
                 if (e.key === 'Enter') saveEdit();
                 if (e.key === 'Escape') setEditing(null);
               }} />
-            <input className="textin" style={{ width: 150 }} type="date" value={eDue}
-              onChange={(e) => setEDue(e.target.value)} />
+            <label className="sub dlabel">始める日
+              <input className="textin" style={{ width: 150 }} type="date" value={eStart}
+                onChange={(e) => setEStart(e.target.value)} />
+            </label>
+            <label className="sub dlabel">期限
+              <input className="textin" style={{ width: 150 }} type="date" value={eDue}
+                onChange={(e) => setEDue(e.target.value)} />
+            </label>
             <label className="chk" style={{ fontSize: 14 }}>
               <input type="checkbox" checked={eImp} onChange={(e) => setEImp(e.target.checked)} />
               <span>重要</span>
@@ -134,8 +158,9 @@ export default function TaskList(p: Props) {
             <button className="primary" disabled={!eTitle.trim()} onClick={saveEdit}>保存</button>
             <button onClick={() => setEditing(null)}>キャンセル</button>
           </div>
+          {dateErr && <p className="legend" style={{ color: 'var(--alert)', margin: '8px 0 0' }}>{dateErr}</p>}
           <p className="legend" style={{ margin: '8px 0 0' }}>
-            期限を空欄にすると「期限なし」になります。
+            期限を空欄にすると「期限なし」になります。始める日を入れると、その日まで一覧から外れ、「全体」の画面にだけ出ます。
           </p>
         </div>
       );
@@ -169,6 +194,8 @@ export default function TaskList(p: Props) {
             </button>
           </span>
           <span className="sub right">
+            {isJustStarted(t, p.today) && <b className="badge new">今日から</b>}
+            {isEarlyByDue(t, p.today) && <b className="badge new">期限が近いため表示</b>}
             {t.important && <b className="badge">重要</b>}
             <span className={dueClass(t, p.today)}>{d ? d.text : '期限なし'}</span>
             {showActs && <span className="rowacts">
@@ -217,6 +244,7 @@ export default function TaskList(p: Props) {
           {p.manual && (
             <button className="linkish" onClick={p.onAuto}>並び順を自動に戻す</button>
           )}
+          <button onClick={p.onOpenAll}>全体を見る</button>
           {!phone && (
             <button onClick={() => setAdding((v) => !v)}>{adding ? 'キャンセル' : '追加'}</button>
           )}
@@ -241,8 +269,14 @@ export default function TaskList(p: Props) {
             onKeyDown={(e) => { if (e.key === 'Enter') submit(); }} />
           {(!phone || title.trim()) && (<>
             {phone && <span className="break" aria-hidden="true" />}
-            <input className="textin" style={{ width: 160 }} type="date" value={due}
-              aria-label="期限" onChange={(e) => setDue(e.target.value)} />
+            <label className="sub dlabel">始める日
+              <input className="textin" style={{ width: 160 }} type="date" value={start}
+                aria-label="始める日" onChange={(e) => setStart(e.target.value)} />
+            </label>
+            <label className="sub dlabel">期限
+              <input className="textin" style={{ width: 160 }} type="date" value={due}
+                aria-label="期限" onChange={(e) => setDue(e.target.value)} />
+            </label>
             <label className="chk" style={{ fontSize: 14 }}>
               <input type="checkbox" checked={important}
                 onChange={(e) => setImportant(e.target.checked)} />
@@ -250,6 +284,7 @@ export default function TaskList(p: Props) {
             </label>
           </>)}
           <button className="primary" disabled={phone && !title.trim()} onClick={submit}>追加</button>
+          {dateErr && !editing && <p className="legend" style={{ color: 'var(--alert)', margin: 0, flexBasis: '100%' }}>{dateErr}</p>}
         </div>
       )}
 
@@ -294,6 +329,36 @@ export default function TaskList(p: Props) {
           </div>
         </>
       )}
+
+      {p.upcoming.length > 0 && (() => {
+        const near = p.upcoming.filter((t) => daysBetween(p.today, t.startDate!) <= PREVIEW_DAYS);
+        const later = p.upcoming.length - near.length;
+        return (
+          <div className="band upcoming">
+            <p className="bandname">
+              これから始まる<span className="note">{PREVIEW_DAYS}日以内に始める日が来るもの</span>
+            </p>
+            {near.length === 0 && <p className="drophint">{PREVIEW_DAYS}日以内に始まるものはありません。</p>}
+            {near.map((t) => editing === t.id ? row(t, 0, 'rest', 0) : (
+              <div className="item" key={t.id}>
+                <div className="head">
+                  <span className="title-1line" title={t.title}>{t.title}</span>
+                  <span className="sub right">
+                    {t.important && <b className="badge">重要</b>}
+                    <span>{fmtMD(t.startDate!)}から{t.dueDate ? `・期限 ${fmtMD(t.dueDate)}` : ''}</span>
+                    <button className="act" onClick={() => startEdit(t)}>編集</button>
+                  </span>
+                </div>
+              </div>
+            ))}
+            {later > 0 && (
+              <p className="more">
+                その先にあと{later}件 ・ <button className="linkish" onClick={p.onOpenAll}>全体を見る</button>
+              </p>
+            )}
+          </div>
+        );
+      })()}
 
       {p.closed.length > 0 && (
         <p className="more">

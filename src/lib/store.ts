@@ -206,12 +206,13 @@ export async function clearTaskBand(ids: string[]) {
     ignoreUndefinedProperties が無視するので、いつまでも消えない。 */
 export async function editTask(
   id: string,
-  patch: { title: string; important: boolean; dueDate: YMD | null },
+  patch: { title: string; important: boolean; dueDate: YMD | null; startDate: YMD | null },
 ) {
   await updateDoc(doc(tasksCol(), id), {
     title: patch.title,
     important: patch.important,
     dueDate: patch.dueDate ?? deleteField(),
+    startDate: patch.startDate ?? deleteField(),
   });
 }
 

@@ -5,6 +5,26 @@ export const URGENT_WITHIN_DAYS = 7;
 
 export function isOpen(t: Task) { return !t.doneAt && !t.deletedAt; }
 
+/** いつもの一覧に出すか。始める日が無いもの・始める日が来たものは出す。
+    始める日の前でも、期限まで7日を切ったら出す（始める日の入れ間違いで締切を見逃さないため）。
+    エステル側の cockpit-store.mjs の isVisible と同じ規則にすること。 */
+export function isStarted(t: Task, today: YMD) {
+  if (!t.startDate || t.startDate <= today) return true;
+  return !!t.dueDate && daysBetween(today, t.dueDate) <= URGENT_WITHIN_DAYS;
+}
+
+/** 始める日の前なのに、期限が近いので出しているもの。 */
+export function isEarlyByDue(t: Task, today: YMD) {
+  return !!t.startDate && t.startDate > today && isStarted(t, today);
+}
+
+/** 始める日から3日間（当日を含む）。手で並べていても上に出し、「今日から」の目印をつける。 */
+export const JUST_STARTED_DAYS = 3;
+export function isJustStarted(t: Task, today: YMD) {
+  if (!t.startDate || t.startDate > today) return false;
+  return daysBetween(t.startDate, today) < JUST_STARTED_DAYS;
+}
+
 export function isUrgent(t: Task, today: YMD): boolean {
   if (!t.dueDate) return false;
   return daysBetween(today, t.dueDate) <= URGENT_WITHIN_DAYS;
@@ -27,6 +47,12 @@ export function sortTasks(tasks: Task[], today: YMD): Task[] {
     // まず帯。「先にやる」は本人が入れたものなので、自動の理屈で追い越さない。
     const band = Number(!a.first) - Number(!b.first);
     if (band !== 0) return band;
+
+    // 始まったばかりのもの（期限が近くて早めに出したものも）は、帯の中で先頭に出す。
+    // 手で並べている途中に増えたものが一覧の末尾に埋もれると、出てきたことごと気づかない。
+    const na = Number(!(isJustStarted(a, today) || isEarlyByDue(a, today)));
+    const nb = Number(!(isJustStarted(b, today) || isEarlyByDue(b, today)));
+    if (na !== nb) return na - nb;
 
     // 帯の中。自分で並べたものが先。
     const ao = a.order, bo = b.order;

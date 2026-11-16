@@ -295,3 +295,10 @@ button[aria-pressed="true"].primary { background:var(--accent); color:#fff; }
 .rm-list { margin:8px 0 0; padding-left:18px; line-height:1.7; }
 .rm-list li[aria-current="step"] { color:var(--accent); }
 @media (max-width: 760px) { .rm-row { grid-template-columns:1fr; } }
+
+/* 始める日・全体の画面（2026-11-16） */
+.dlabel { display:inline-flex; align-items:center; gap:6px; font-size:13px; }
+.band.upcoming { opacity:.6; }
+.band.upcoming .act { margin-left:8px; }
+.yearview .ymonth { margin-top:14px; }
+.badge.new { color:var(--accent); }

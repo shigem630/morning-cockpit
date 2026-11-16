@@ -5,7 +5,7 @@ import {
   addDays, detectClockSkew, isBusinessDay, logicalToday, type YMD,
 } from './lib/dates';
 import { eligibleRoutines, last30Days } from './lib/eligible';
-import { isManualOrder, isOpen, sortTasks } from './lib/priority';
+import { isManualOrder, isOpen, isStarted, sortTasks } from './lib/priority';
 import {
   addStalled, addTask, clearFocus, clearTaskOrder, editTask, nudge, reopenStalled, reorderTasks,
   resolveStalled, restoreTask, setFocus, setStalledDue, setWorked, toggleCheck, unnudge,
@@ -26,6 +26,7 @@ import StalledList from './components/StalledList';
 import RoutineChecks from './components/RoutineChecks';
 import TodaySchedule, { type CalState } from './components/TodaySchedule';
 import TaskList, { SoonCard } from './components/TaskList';
+import YearView from './components/YearView';
 
 const nowHHMM = () =>
   new Intl.DateTimeFormat('en-GB', {
@@ -101,9 +102,30 @@ function Cockpit({ user }: { user: User }) {
   const [log, logSync] = useDayLog(today);
   const recent = useRecentLogs(useMemo(() => last30Days(today), [today]));
 
-  const openTasks = useMemo(
+  // 未完了のすべて（全体の画面用）と、始める日が来ているもの（いつもの画面用）。
+  // 始める日の前のものは、毎朝の一覧にも最優先の候補にも出さない。
+  const allOpen = useMemo(
     () => sortTasks(tasks.filter(isOpen), today), [tasks, today],
   );
+  const openTasks = useMemo(() => allOpen.filter((t) => isStarted(t, today)), [allOpen, today]);
+  const upcoming = useMemo(
+    () => allOpen.filter((t) => !isStarted(t, today))
+      .sort((a, b) => a.startDate!.localeCompare(b.startDate!)),
+    [allOpen, today],
+  );
+
+  /* ───── 全体の画面。アドレスの末尾 #all で直接開ける（ホーム画面に置ける） ───── */
+  const [allView, setAllView] = useState(() => location.hash === '#all');
+  useEffect(() => {
+    const onHash = () => setAllView(location.hash === '#all');
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+  const openAll = () => { location.hash = 'all'; window.scrollTo(0, 0); };
+  const closeAll = () => {
+    history.replaceState(null, '', location.pathname + location.search);
+    setAllView(false); window.scrollTo(0, 0);
+  };
   const closedTasks = useMemo(
     () => tasks.filter((t) => !isOpen(t))
       .sort((a, b) => (b.doneAt ?? b.deletedAt ?? '').localeCompare(a.doneAt ?? a.deletedAt ?? '')),
@@ -344,6 +366,14 @@ function Cockpit({ user }: { user: User }) {
     }
   };
 
+  if (allView) {
+    return (
+      <div className="wrap">
+        <YearView today={today} tasks={allOpen} onBack={closeAll} />
+      </div>
+    );
+  }
+
   return (
     <>
       {/* スマホでは cols / stack の囲いを外して1列にし、slot の順番を CSS で入れ替える。
@@ -442,10 +472,11 @@ function Cockpit({ user }: { user: User }) {
             <div className="slot slot-soon"><SoonCard today={today} task={soon} /></div>
             <div className="slot slot-tasks"><TaskList
               today={today} tasks={openTasks} closed={closedTasks}
+              upcoming={upcoming} onOpenAll={openAll}
               manual={manual} onReorder={applyOrder} onAuto={backToAuto}
-              onAdd={(title, important, dueDate) =>
+              onAdd={(title, important, dueDate, startDate) =>
                 addTask({
-                  title, important, dueDate, createdAt: today, order: nextTopOrder(),
+                  title, important, dueDate, startDate, createdAt: today, order: nextTopOrder(),
                 })}
               onEdit={(id, patch) => editTask(id, patch)}
               onDone={(id) => updateTask(id, { doneAt: today })}
@@ -464,6 +495,10 @@ function Cockpit({ user }: { user: User }) {
             {t.count !== undefined && <span className="tc">{t.count}</span>}
           </button>
         ))}
+        <button aria-pressed={false} onClick={openAll}>
+          <span className="tl">全体</span>
+          <span className="tc">{allOpen.length}</span>
+        </button>
       </nav>
     </>
   );
